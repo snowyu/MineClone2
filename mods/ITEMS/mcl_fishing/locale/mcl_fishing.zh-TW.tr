@@ -1,0 +1,18 @@
+# textdomain: mcl_fishing
+Fishing Rod=釣魚竿
+Fishing rods can be used to catch fish.=釣魚竿可以用來釣魚
+Rightclick to launch the bobber. When it sinks right-click again to reel in an item. Who knows what you're going to catch?=右鍵單擊以啓動浮漂。 當它下沈時再次右鍵單擊以拉回釣到的東西。 誰知道你要抓到什麼？
+Raw Fish=生魚
+Raw fish is obtained by fishing and is a food item which can be eaten safely. Cooking it improves its nutritional value.=生魚是通過釣魚獲得的，是可以安全食用的食品。 烹飪它可以提高其營養價值。
+Cooked Fish=熟魚
+Mmh, fish! This is a healthy food item.=嗯，魚！ 這是一種健康食品
+Raw Salmon=生鮭魚
+Raw salmon is obtained by fishing and is a food item which can be eaten safely. Cooking it improves its nutritional value.=生鮭魚是通過釣魚獲得的，是可以安全食用的食品。 煮熟它可以提高它的營養價值
+Cooked Salmon=熟鮭魚
+This is a healthy food item which can be eaten.=這是一種可以食用的健康食品
+Clownfish=小醜魚
+Clownfish may be obtained by fishing (and luck) and is a food item which can be eaten safely.=小醜魚可以通過釣魚（和運氣）獲得，是一種可以安全食用的食品
+Pufferfish=河豚
+Pufferfish are a common species of fish and can be obtained by fishing. They can technically be eaten, but they are very bad for humans. Eating a pufferfish only restores 1 hunger point and will poison you very badly (which drains your health non-fatally) and causes serious food poisoning (which increases your hunger).=河豚是一種常見的魚類，可以通過釣魚獲得。 它們在技術上是可以食用的，但它們對人類非常不利。 吃河豚隻會恢複 1 點饑餓值，並且會嚴重毒害你（這會非緻命地消耗你的健康）並導緻嚴重的食物中毒（這會增加你的饑餓感）
+Catches fish in water=抓到水裏的魚
+Very poisonous=劇毒

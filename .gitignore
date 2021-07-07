@@ -1,2 +1,4 @@
 # Text Editor TMP Files
 *.swp
+# translation backup files
+*.old

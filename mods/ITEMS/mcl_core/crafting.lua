@@ -228,14 +228,14 @@ minetest.register_craft({
 minetest.register_craft({
 	type = "cooking",
 	output = "mcl_core:iron_nugget",
-	recipe = "mobs_mc:iron_horse_armor",
+	recipe = "mcl_mobitems:iron_horse_armor",
 	cooktime = 10,
 })
 
 minetest.register_craft({
 	type = "cooking",
 	output = "mcl_core:gold_nugget",
-	recipe = "mobs_mc:gold_horse_armor",
+	recipe = "mcl_mobitems:gold_horse_armor",
 	cooktime = 10,
 })
 
@@ -382,8 +382,14 @@ minetest.register_craft({
 	}
 })
 
--- TODO: Add crafting recipe: 9 ice → 1 packed ice
--- Add it when silk touch tools work.
+minetest.register_craft({
+	output = 'mcl_core:packed_ice 1',
+	recipe = {
+		{'mcl_core:ice', 'mcl_core:ice', 'mcl_core:ice'},
+		{'mcl_core:ice', 'mcl_core:ice', 'mcl_core:ice'},
+		{'mcl_core:ice', 'mcl_core:ice', 'mcl_core:ice'},
+	}
+})
 
 --
 -- Crafting (tool repair)

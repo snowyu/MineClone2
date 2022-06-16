@@ -41,6 +41,7 @@ Please read <http://minecraft.gamepedia.com/Breaking> to learn how digging times
     * `flammable=-1` Does not get destroyed by fire
 * `fire_encouragement`: How quickly this block catches fire
 * `fire_flammability`: How fast the block will burn away
+* `path_creation_possible=1`: Node can be turned into grass path by using a shovel on it
 * `spreading_dirt_type=1`: A dirt-type block with a cover (e.g. grass) which may spread to neighbor dirt blocks
 * `dirtifies_below_solid=1`: This node turns into dirt immediately when a solid or dirtifier node is placed on top
 * `dirtifier=1`: This node turns nodes the above group into dirt when placed above
@@ -56,6 +57,7 @@ Please read <http://minecraft.gamepedia.com/Breaking> to learn how digging times
 * `no_eat_delay=1`: Only for foodstuffs. When eating this, all eating delays are ignored.
 * `can_eat_when_full=1`: Only for foodstuffs. This item can be eaten when the user has a full hunger bar
 * `attached_node_facedir=1`: Like `attached_node`, but for facedir nodes
+* `supported_node=1`: Like `attached_node`, but can be placed on any nodes that do not have the `drawtype="airlike"` attribute.
 * `cauldron`: Cauldron. 1: Empty. 2-4: Water height
 * `anvil`: Anvil. 1: No damage. 2-3: Higher damage levels
 * `no_rename=1`: Item cannot be renamed by anvil
@@ -71,6 +73,7 @@ Please read <http://minecraft.gamepedia.com/Breaking> to learn how digging times
 * `coral_block=X`: Coral block (1 = alive, 2 = dead)
 * `coral_species=X`: Specifies the species of a coral; equal X means equal species
 * `set_on_fire=X`: Sets any (not fire-resistant) mob or player on fire for X seconds when touching
+* `compostability=X`: Item can be used on a composter block; X (1-100) is the % chance of adding a level of compost
 
 #### Footnotes
 
@@ -99,6 +102,8 @@ Please read <http://minecraft.gamepedia.com/Breaking> to learn how digging times
 * `water_bucket=1`: Bucket containing a liquid of group “water”
 * `enchantability=X`: How good the enchantments are the item gets (1 equals book)
 * `enchanted=1`: The item is already enchanted, meaning that it can't be enchanted using an enchanting table
+* `cobble=1`: Cobblestone of any kind
+* `soul_block`: Fire burning on these blocks turns to soul fire, can be used to craft soul torch
 
 ### Material groups
 
@@ -199,6 +204,9 @@ These groups are used mostly for informational purposes
 * `transport=1`: Item is used for transportation
 * `building_block=1`: Block is a building block
 * `deco_block=1`: Block is a decorational block
+
+* `blast_furnace_smeltable=1` : Item or node is smeltable by a blast furnace
+* `smoker_cookable=1` : Food is cookable by a smoker. 
 
 
 ## Fake item groups

@@ -1,16 +1,13 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
-mobs:register_mob("mobs_mc:bat", {
+mcl_mobs:register_mob("mobs_mc:bat", {
 	description = S("Bat"),
 	type = "animal",
 	spawn_class = "ambient",
 	can_despawn = true,
 	passive = true,
-	rotate = 270,
-	tilt_fly = true,
-	fly = true,
 	hp_min = 6,
 	hp_max = 6,
 	collisionbox = {-0.25, -0.01, -0.25, 0.25, 0.89, 0.25},
@@ -48,7 +45,9 @@ mobs:register_mob("mobs_mc:bat", {
 	fall_damage = 0,
 	view_range = 16,
 	fear_height = 0,
+
 	jump = false,
+	fly = true,
 	makes_footstep_sound = false,
 })
 
@@ -66,7 +65,7 @@ else
 end
 
 -- Spawn on solid blocks at or below Sea level and the selected light level
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:bat",
 "overworld",
 "ground",
@@ -139,9 +138,9 @@ maxlight,
 20,
 5000,
 2,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.water-1)
+mcl_vars.mg_overworld_min,
+mobs_mc.water_level-1)
 
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:bat", S("Bat"), "mobs_mc_spawn_icon_bat.png", 0)
+mcl_mobs:register_egg("mobs_mc:bat", S("Bat"), "mobs_mc_spawn_icon_bat.png", 0)

@@ -3,7 +3,7 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### ZOMBIE VILLAGER
@@ -25,13 +25,10 @@ local professions = {
 	nitwit = "mobs_mc_villager.png",
 }
 
-mobs:register_mob("mobs_mc:villager_zombie", {
+mcl_mobs:register_mob("mobs_mc:villager_zombie", {
 	description = S("Zombie Villager"),
 	type = "monster",
 	spawn_class = "hostile",
-	hostile = true,
-	rotate = 270,
-	eye_height = 1.65,
 	hp_min = 20,
 	hp_max = 20,
 	xp_min = 5,
@@ -54,28 +51,28 @@ mobs:register_mob("mobs_mc:villager_zombie", {
 	damage = 3,
 	reach = 2,
 	walk_velocity = 1.2,
-	run_velocity = 3.5,
-	attack_type = "punch",
+	run_velocity = 2.4,
+	attack_type = "dogfight",
 	group_attack = true,
 	drops = {
-		{name = mobs_mc.items.rotten_flesh,
+		{name = "mcl_mobitems:rotten_flesh",
 		chance = 1,
 		min = 0,
 		max = 2,
 		looting = "common",},
-		{name = mobs_mc.items.iron_ingot,
+		{name = "mcl_core:iron_ingot",
 		chance = 120, -- 2.5% / 3
 		min = 1,
 		max = 1,
 		looting = "rare",
 		looting_factor = 0.01 / 3,},
-		{name = mobs_mc.items.carrot,
+		{name = "mcl_farming:carrot_item",
 		chance = 120, -- 2.5% / 3
 		min = 1,
 		max = 1,
 		looting = "rare",
 		looting_factor = 0.01 / 3,},
-		{name = mobs_mc.items.potato,
+		{name = "mcl_farming:potato_item",
 		chance = 120, -- 2.5% / 3
 		min = 1,
 		max = 1,
@@ -150,7 +147,7 @@ mobs:register_mob("mobs_mc:villager_zombie", {
 	harmed_by_heal = true,
 })
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:villager_zombie",
 "overworld",
 "ground",
@@ -240,9 +237,9 @@ mobs:spawn_specific(
 30,
 4090,
 4,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
---mobs:spawn_specific("mobs_mc:villager_zombie", "overworld", "ground", 0, 7, 30, 60000, 4, mobs_mc.spawn_height.overworld_min, mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
+--mcl_mobs:spawn_specific("mobs_mc:villager_zombie", "overworld", "ground", 0, 7, 30, 60000, 4, mcl_vars.mg_overworld_min, mcl_vars.mg_overworld_max)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:villager_zombie", S("Zombie Villager"), "mobs_mc_spawn_icon_zombie_villager.png", 0)
+mcl_mobs:register_egg("mobs_mc:villager_zombie", S("Zombie Villager"), "mobs_mc_spawn_icon_zombie_villager.png", 0)

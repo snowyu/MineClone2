@@ -198,7 +198,20 @@ local function register_entity(entity_id, mesh, textures, drop, on_rightclick, o
 		else
 			self._last_float_check = self._last_float_check + dtime
 		end
-		local pos, rou_pos, node
+
+		local pos, rou_pos, node = self.object:get_pos()
+		local r = 0.6
+		for _, node_pos in pairs({{r, 0}, {0, r}, {-r, 0}, {0, -r}}) do
+			if minetest.get_node(vector.offset(pos, node_pos[1], 0, node_pos[2])).name == "mcl_core:cactus" then
+				detach_driver(self)
+				for d = 1, #drop do
+					minetest.add_item(pos, drop[d])
+				end
+				self.object:remove()
+				return
+			end
+		end
+
 		-- Drop minecart if it isn't on a rail anymore
 		if self._last_float_check >= mcl_minecarts.check_float_time then
 			pos = self.object:get_pos()
@@ -419,7 +432,8 @@ local function register_entity(entity_id, mesh, textures, drop, on_rightclick, o
 			-- Slow down or speed up
 			local acc = dir.y * -1.8
 			local friction = 0.4
-			local speed_mod = minetest.registered_nodes[minetest.get_node(pos).name]._rail_acceleration
+			local ndef = minetest.registered_nodes[minetest.get_node(pos).name]
+			local speed_mod = ndef and ndef._rail_acceleration
 
 			acc = acc - friction
 

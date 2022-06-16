@@ -3,31 +3,31 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### ZOMBIE
 --###################
 
 local drops_common = {
-	{name = mobs_mc.items.rotten_flesh,
+	{name = "mcl_mobitems:rotten_flesh",
 	chance = 1,
 	min = 0,
 	max = 2,
 	looting = "common",},
-	{name = mobs_mc.items.iron_ingot,
+	{name = "mcl_core:iron_ingot",
 	chance = 120, -- 2.5% / 3
 	min = 1,
 	max = 1,
 	looting = "rare",
 	looting_factor = 0.01 / 3,},
-	{name = mobs_mc.items.carrot,
+	{name = "mcl_farming:carrot_item",
 	chance = 120, -- 2.5% / 3
 	min = 1,
 	max = 1,
 	looting = "rare",
 	looting_factor = 0.01 / 3,},
-	{name = mobs_mc.items.potato,
+	{name = "mcl_farming:potato_item",
 	chance = 120, -- 2.5% / 3
 	min = 1,
 	max = 1,
@@ -39,7 +39,7 @@ local drops_zombie = table.copy(drops_common)
 table.insert(drops_zombie, {
 	-- Zombie Head
 	-- TODO: Only drop if killed by charged creeper
-	name = mobs_mc.items.head_zombie,
+	name = "mcl_heads:zombie",
 	chance = 200, -- 0.5%
 	min = 1,
 	max = 1,
@@ -49,8 +49,6 @@ local zombie = {
 	description = S("Zombie"),
 	type = "monster",
 	spawn_class = "hostile",
-	hostile = true,
-	rotate = 270,
 	hp_min = 20,
 	hp_max = 20,
 	xp_min = 5,
@@ -76,25 +74,8 @@ local zombie = {
 		damage = "mobs_mc_zombie_hurt",
 		distance = 16,
 	},
-
-	--head code
-	has_head = false,
-	head_bone = "Head",
-
-	swap_y_with_x = true,
-	reverse_head_yaw = true,
-
-	head_bone_pos_y = 2.4,
-	head_bone_pos_z = 0,
-
-	head_height_offset = 1.1,
-	head_direction_offset = 0,
-	head_pitch_modifier = 0,
-	--end head code
-
-	eye_height = 1.65,
-	walk_velocity = 1,
-	run_velocity = 3.5,
+	walk_velocity = .8,
+	run_velocity = 1.6,
 	damage = 3,
 	reach = 2,
 	fear_height = 4,
@@ -112,12 +93,11 @@ local zombie = {
 	ignited_by_sunlight = true,
 	sunlight_damage = 2,
 	view_range = 16,
-	attack_type = "punch",
-	punch_timer_cooloff = 0.5,
+	attack_type = "dogfight",
 	harmed_by_heal = true,
 }
 
-mobs:register_mob("mobs_mc:zombie", zombie)
+mcl_mobs:register_mob("mobs_mc:zombie", zombie)
 
 -- Baby zombie.
 -- A smaller and more dangerous variant of the zombie
@@ -132,7 +112,7 @@ baby_zombie.walk_velocity = 1.2
 baby_zombie.run_velocity = 2.4
 baby_zombie.child = 1
 
-mobs:register_mob("mobs_mc:baby_zombie", baby_zombie)
+mcl_mobs:register_mob("mobs_mc:baby_zombie", baby_zombie)
 
 -- Husk.
 -- Desert variant of the zombie
@@ -150,7 +130,7 @@ husk.sunlight_damage = 0
 husk.drops = drops_common
 -- TODO: Husks avoid water
 
-mobs:register_mob("mobs_mc:husk", husk)
+mcl_mobs:register_mob("mobs_mc:husk", husk)
 
 -- Baby husk.
 -- A smaller and more dangerous variant of the husk
@@ -164,12 +144,12 @@ baby_husk.walk_velocity = 1.2
 baby_husk.run_velocity = 2.4
 baby_husk.child = 1
 
-mobs:register_mob("mobs_mc:baby_husk", baby_husk)
+mcl_mobs:register_mob("mobs_mc:baby_husk", baby_husk)
 
 
 -- Spawning
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:zombie",
 "overworld",
 "ground",
@@ -217,7 +197,6 @@ mobs:spawn_specific(
 "ExtremeHills+",
 "Forest",
 "Plains",
-"Desert",
 "ColdTaiga",
 "MushroomIsland",
 "IcePlainsSpikes",
@@ -259,10 +238,10 @@ mobs:spawn_specific(
 30,
 6000,
 4,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 -- Baby zombie is 20 times less likely than regular zombies
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:baby_zombie",
 "overworld",
 "ground",
@@ -310,7 +289,6 @@ mobs:spawn_specific(
 "ExtremeHills+",
 "Forest",
 "Plains",
-"Desert",
 "ColdTaiga",
 "MushroomIsland",
 "IcePlainsSpikes",
@@ -352,45 +330,39 @@ mobs:spawn_specific(
 30,
 60000,
 4,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:husk",
 "overworld",
 "ground",
 {
 "Desert",
-"SavannaM",
-"Savanna",
-"Savanna_beach",
 },
 0,
 7,
 30,
 6500,
 4,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
-mobs:spawn_specific(
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_specific(
 "mobs_mc:baby_husk",
 "overworld",
 "ground",
 {
 "Desert",
-"SavannaM",
-"Savanna",
-"Savanna_beach",
 },
 0,
 7,
 30,
 65000,
 4,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 -- Spawn eggs
-mobs:register_egg("mobs_mc:husk", S("Husk"), "mobs_mc_spawn_icon_husk.png", 0)
-mobs:register_egg("mobs_mc:zombie", S("Zombie"), "mobs_mc_spawn_icon_zombie.png", 0)
+mcl_mobs:register_egg("mobs_mc:husk", S("Husk"), "mobs_mc_spawn_icon_husk.png", 0)
+mcl_mobs:register_egg("mobs_mc:zombie", S("Zombie"), "mobs_mc_spawn_icon_zombie.png", 0)

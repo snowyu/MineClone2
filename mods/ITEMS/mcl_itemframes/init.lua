@@ -64,7 +64,10 @@ minetest.register_entity("mcl_itemframes:map", {
 	},
 	on_activate = function(self, staticdata)
 		self.id = staticdata
-		self.object:set_properties({textures = {mcl_maps.load_map(self.id)}})
+		mcl_maps.load_map(self.id, function(texture)
+			-- will not crash even if self.object is invalid by now
+			self.object:set_properties({textures = {texture}})
+		end)
 	end,
 	get_staticdata = function(self)
 		return self.id
@@ -222,7 +225,7 @@ minetest.register_node("mcl_itemframes:item_frame",{
 		put_itemstack:set_count(1)
 		local itemname = put_itemstack:get_name()
 		if minetest.get_item_group(itemname, "compass") > 0 then
-			put_itemstack:set_name("mcl_compass:" .. mcl_compass.get_compass_image(pos, minetest.dir_to_yaw(minetest.facedir_to_dir(node.param2))))
+			put_itemstack:set_name(mcl_compass.get_compass_itemname(pos, minetest.dir_to_yaw(minetest.facedir_to_dir(node.param2)), put_itemstack))
 		end
 		if minetest.get_item_group(itemname, "clock") > 0 then
 			minetest.get_node_timer(pos):start(1.0)

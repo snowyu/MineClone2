@@ -3,7 +3,7 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### OCELOT AND CAT
@@ -13,16 +13,15 @@ local pr = PseudoRandom(os.time()*12)
 
 local default_walk_chance = 70
 
--- Returns true if the item is food (taming) for the cat/ocelot
-local is_food = function(itemstring)
-	for f=1, #mobs_mc.follow.ocelot do
-		if itemstring == mobs_mc.follow.ocelot[f] then
-			return true
-		elseif string.sub(itemstring, 1, 6) == "group:" and minetest.get_item_group(itemstring, string.sub(itemstring, 7, -1)) ~= 0 then
-			return true
-		end
-	end
-	return false
+local follow = {
+	"mcl_fishing:fish_raw",
+	"mcl_fishing:salmon_raw",
+	"mcl_fishing:clownfish_raw",
+	"mcl_fishing:pufferfish_raw",
+}
+
+local function is_food(itemstring)
+	return table.indexof(follow, itemstring) ~= -1
 end
 
 -- Ocelot
@@ -31,8 +30,6 @@ local ocelot = {
 	type = "animal",
 	spawn_class = "passive",
 	can_despawn = true,
-	rotate = 270,
-	skittish = true,
 	hp_min = 10,
 	hp_max = 10,
 	xp_min = 1,
@@ -45,7 +42,7 @@ local ocelot = {
 	makes_footstep_sound = true,
 	walk_chance = default_walk_chance,
 	walk_velocity = 1,
-	run_velocity = 10,
+	run_velocity = 3,
 	follow_velocity = 1,
 	floats = 1,
 	runaway = true,
@@ -59,7 +56,7 @@ local ocelot = {
 	},
 	animation = {
 		speed_normal = 25,
-		run_speed = 150,
+		run_speed = 50,
 		stand_start = 0,
 		stand_end = 0,
 		walk_start = 0,
@@ -67,7 +64,7 @@ local ocelot = {
 		run_start = 0,
 		run_end = 40,
 	},
-	follow = mobs_mc.follow.ocelot,
+	follow = follow,
 	view_range = 12,
 	passive = true,
 	attack_type = "dogfight",
@@ -101,7 +98,7 @@ local ocelot = {
 	end,
 }
 
-mobs:register_mob("mobs_mc:ocelot", ocelot)
+mcl_mobs:register_mob("mobs_mc:ocelot", ocelot)
 
 -- Cat
 local cat = table.copy(ocelot)
@@ -124,7 +121,9 @@ cat.sounds = {
 	distance = 16,
 }
 cat.on_rightclick = function(self, clicker)
-	if mobs:feed_tame(self, clicker, 1, true, false) then return end
+	if mcl_mobs:feed_tame(self, clicker, 1, true, false) then return end
+	if mcl_mobs:capture_mob(self, clicker, 0, 60, 5, false, nil) then return end
+	if mcl_mobs:protect(self, clicker) then return end
 
 	if self.child then return end
 
@@ -149,13 +148,13 @@ cat.on_rightclick = function(self, clicker)
 
 end
 
-mobs:register_mob("mobs_mc:cat", cat)
+mcl_mobs:register_mob("mobs_mc:cat", cat)
 
---local base_spawn_chance = 5000
+local base_spawn_chance = 5000
 
 -- Spawn ocelot
 --they get the same as the llama because I'm trying to rework so much of this code right now -j4i
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:ocelot",
 "overworld",
 "ground",
@@ -170,19 +169,19 @@ minetest.LIGHT_MAX+1,
 30,
 15000,
 5,
-mobs_mc.spawn_height.water+15,
-mobs_mc.spawn_height.overworld_max)
+mobs_mc.water_level+15,
+mcl_vars.mg_overworld_max)
 --[[
 mobs:spawn({
 	name = "mobs_mc:ocelot",
-	nodes = mobs_mc.spawn.jungle,
+	nodes = { "mcl_core:jungletree", "mcl_core:jungleleaves", "mcl_flowers:fern", "mcl_core:vine" },
 	neighbors = {"air"},
 	light_max = minetest.LIGHT_MAX+1,
 	light_min = 0,
 	chance = math.ceil(base_spawn_chance * 1.5), -- emulates 1/3 spawn failure rate
 	active_object_count = 12,
-	min_height = mobs_mc.spawn_height.water+1, -- Right above ocean level
-	max_height = mobs_mc.spawn_height.overworld_max,
+	min_height = mobs_mc.water_level+1, -- Right above ocean level
+	max_height = mcl_vars.mg_overworld_max,
 	on_spawn = function(self, pos)
 		 Note: Minecraft has a 1/3 spawn failure rate.
 		In this mod it is emulated by reducing the spawn rate accordingly (see above).
@@ -232,4 +231,4 @@ mobs:spawn({
 
 -- spawn eggs
 -- FIXME: The spawn icon shows a cat texture, not an ocelot texture
-mobs:register_egg("mobs_mc:ocelot", S("Ocelot"), "mobs_mc_spawn_icon_cat.png", 0)
+mcl_mobs:register_egg("mobs_mc:ocelot", S("Ocelot"), "mobs_mc_spawn_icon_cat.png", 0)

@@ -4,9 +4,9 @@
 --################### SQUID
 --###################
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
-mobs:register_mob("mobs_mc:squid", {
+mcl_mobs:register_mob("mobs_mc:squid", {
 	description = S("Squid"),
     type = "animal",
     spawn_class = "water",
@@ -17,8 +17,6 @@ mobs:register_mob("mobs_mc:squid", {
     xp_min = 1,
     xp_max = 3,
     armor = 100,
-    rotate = 270,
-    tilt_swim = true,
     -- FIXME: If the squid is near the floor, it turns black
     collisionbox = {-0.4, 0.0, -0.4, 0.4, 0.9, 0.4},
     visual = "mesh",
@@ -42,7 +40,7 @@ mobs:register_mob("mobs_mc:squid", {
 		run_end = 60,
 	},
     drops = {
-		{name = mobs_mc.items.black_dye,
+		{name = "mcl_dye:black",
 		chance = 1,
 		min = 1,
 		max = 3,
@@ -50,7 +48,8 @@ mobs:register_mob("mobs_mc:squid", {
 	},
     visual_size = {x=3, y=3},
     makes_footstep_sound = false,
-    swim = true,
+    fly = true,
+    fly_in = { "mcl_core:water_source", "mclx_core:river_water_source" },
     breathes_in_water = true,
     jump = false,
     view_range = 16,
@@ -62,9 +61,9 @@ mobs:register_mob("mobs_mc:squid", {
 
 -- Spawn near the water surface
 
-local water = mobs_mc.spawn_height.water
+local water = mobs_mc.water_level
 --name, nodes, neighbours, minlight, maxlight, interval, chance, active_object_count, min_height, max_height
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:squid",
 "overworld",
 "water",
@@ -218,4 +217,4 @@ water-16,
 water+1)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:squid", S("Squid"), "mobs_mc_spawn_icon_squid.png", 0)
+mcl_mobs:register_egg("mobs_mc:squid", S("Squid"), "mobs_mc_spawn_icon_squid.png", 0)

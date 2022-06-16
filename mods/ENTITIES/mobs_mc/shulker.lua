@@ -3,7 +3,7 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### SHULKER
@@ -11,11 +11,11 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 -- animation 45-80 is transition between passive and attack stance
 
-mobs:register_mob("mobs_mc:shulker", {
+mcl_mobs:register_mob("mobs_mc:shulker", {
 	description = S("Shulker"),
 	type = "monster",
 	spawn_class = "hostile",
-	attack_type = "projectile",
+	attack_type = "shoot",
 	shoot_interval = 0.5,
 	arrow = "mobs_mc:shulkerbullet",
 	shoot_offset = 0.5,
@@ -33,9 +33,10 @@ mobs:register_mob("mobs_mc:shulker", {
 	-- TODO: Make shulker dye-able
 	visual_size = {x=3, y=3},
 	walk_chance = 0,
+	knock_back = false,
 	jump = false,
 	drops = {
-		{name = mobs_mc.items.shulker_shell,
+		{name = "mcl_mobitems:shulker_shell",
 		chance = 2,
 		min = 1,
 		max = 1,
@@ -55,7 +56,7 @@ mobs:register_mob("mobs_mc:shulker", {
 })
 
 -- bullet arrow (weapon)
-mobs:register_arrow("mobs_mc:shulkerbullet", {
+mcl_mobs:register_arrow("mobs_mc:shulkerbullet", {
 	visual = "sprite",
 	visual_size = {x = 0.25, y = 0.25},
 	textures = {"mobs_mc_shulkerbullet.png"},
@@ -80,9 +81,9 @@ mobs:register_arrow("mobs_mc:shulkerbullet", {
 })
 
 
-mobs:register_egg("mobs_mc:shulker", S("Shulker"), "mobs_mc_spawn_icon_shulker.png", 0)
+mcl_mobs:register_egg("mobs_mc:shulker", S("Shulker"), "mobs_mc_spawn_icon_shulker.png", 0)
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:shulker",
 "end",
 "ground",
@@ -94,5 +95,5 @@ minetest.LIGHT_MAX+1,
 30,
 5000,
 2,
-mobs_mc.spawn_height.end_min,
-mobs_mc.spawn_height.end_max)
+mcl_vars.mg_end_min,
+mcl_vars.mg_end_max)

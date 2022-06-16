@@ -99,7 +99,7 @@ minetest.register_node("mcl_portals:portal_end", {
 	groups = {portal=1, not_in_creative_inventory = 1, disable_jump = 1},
 
 	_mcl_hardness = -1,
-	_mcl_blast_resistance = 36000000,
+	_mcl_blast_resistance = 3600000,
 })
 
 -- Obsidian platform at the End portal destination in the End
@@ -241,7 +241,7 @@ function mcl_portals.end_portal_teleport(pos, node)
 			end
 
 			mcl_portals.end_teleport(obj, objpos)
-
+			awards.unlock(obj:get_player_name(), "mcl:enterEndPortal")
 		end
 	end
 end

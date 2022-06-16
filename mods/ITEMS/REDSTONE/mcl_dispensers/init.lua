@@ -82,7 +82,7 @@ local dispenserdef = {
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		local meta = minetest.get_meta(pos)
-		local meta2 = meta
+		local meta2 = meta:to_table()
 		meta:from_table(oldmetadata)
 		local inv = meta:get_inventory()
 		for i=1, inv:get_size("main") do
@@ -92,7 +92,7 @@ local dispenserdef = {
 				minetest.add_item(p, stack)
 			end
 		end
-		meta:from_table(meta2:to_table())
+		meta:from_table(meta2)
 	end,
 	_mcl_blast_resistance = 3.5,
 	_mcl_hardness = 3.5,
@@ -133,7 +133,7 @@ local dispenserdef = {
 					if not stackdef then
 						return
 					end
-					
+
 					local iname = stack:get_name()
 					local igroups = stackdef.groups
 
@@ -185,7 +185,7 @@ local dispenserdef = {
 									entity.base_texture = { "blank.png", "mobs_mc_sheep.png" }
 									texture = entity.base_texture
 									entity.drops = {
-										{ name = mobs_mc.items.mutton_raw, chance = 1, min = 1, max = 2 },
+										{ name = "mcl_mobitems:mutton", chance = 1, min = 1, max = 2 },
 									}
 									used = true
 								elseif entname == "mobs_mc:snowman" then
@@ -199,9 +199,9 @@ local dispenserdef = {
 								elseif entname == "mobs_mc:mooshroom" then
 									local droppos = vector.offset(pos, 0, 1.4, 0)
 									if entity.base_texture[1] == "mobs_mc_mooshroom_brown.png" then
-										minetest.add_item(droppos, mobs_mc.items.mushroom_brown .. " 5")
+										minetest.add_item(droppos, "mcl_mushrooms:mushroom_brown 5")
 									else
-										minetest.add_item(droppos, mobs_mc.items.mushroom_red .. " 5")
+										minetest.add_item(droppos, "mcl_mushrooms:mushroom_red 5")
 									end
 									obj = mcl_util.replace_mob(obj, "mobs_mc:cow")
 									entity = obj:get_luaentity()

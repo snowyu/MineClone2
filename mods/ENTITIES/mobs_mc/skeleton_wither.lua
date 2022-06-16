@@ -3,13 +3,13 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### WITHER SKELETON
 --###################
 
-mobs:register_mob("mobs_mc:witherskeleton", {
+mcl_mobs:register_mob("mobs_mc:witherskeleton", {
 	description = S("Wither Skeleton"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -44,19 +44,19 @@ mobs:register_mob("mobs_mc:witherskeleton", {
 	damage = 7,
 	reach = 2,
 	drops = {
-		{name = mobs_mc.items.coal,
+		{name = "mcl_core:coal_lump",
 		chance = 1,
 		min = 0,
 		max = 1,
 		looting = "common",},
-		{name = mobs_mc.items.bone,
+		{name = "mcl_mobitems:bone",
 		chance = 1,
 		min = 0,
 		max = 2,
 		looting = "common",},
 
 		-- Head
-		{name = mobs_mc.items.head_wither_skeleton,
+		{name = "mcl_heads:wither_skeleton",
 		chance = 40, -- 2.5% chance
 		min = 1,
 		max = 1,
@@ -87,7 +87,7 @@ mobs:register_mob("mobs_mc:witherskeleton", {
 	fire_damage = 0,
 	light_damage = 0,
 	view_range = 16,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	dogshoot_switch = 1,
 	dogshoot_count_max =0.5,
 	fear_height = 4,
@@ -96,7 +96,7 @@ mobs:register_mob("mobs_mc:witherskeleton", {
 })
 
 --spawn
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:witherskeleton",
 "nether",
 "ground",
@@ -108,8 +108,8 @@ mobs:spawn_specific(
 30,
 5000,
 5,
-mobs_mc.spawn_height.nether_min,
-mobs_mc.spawn_height.nether_max)
+mcl_vars.mg_nether_min,
+mcl_vars.mg_nether_max)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:witherskeleton", S("Wither Skeleton"), "mobs_mc_spawn_icon_witherskeleton.png", 0)
+mcl_mobs:register_egg("mobs_mc:witherskeleton", S("Wither Skeleton"), "mobs_mc_spawn_icon_witherskeleton.png", 0)

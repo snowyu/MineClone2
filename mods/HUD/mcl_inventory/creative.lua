@@ -1,5 +1,6 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 local F = minetest.formspec_escape
+local C = minetest.colorize
 
 -- Prepare player info table
 local players = {}
@@ -289,6 +290,19 @@ filtername["inv"] = S("Survival Inventory")
 	bg["default"] = dark_bg
 end]]
 
+local function get_stack_size(player)
+	return player:get_meta():get_int("mcl_inventory:switch_stack")
+end
+
+local function set_stack_size(player, n)
+	player:get_meta():set_int("mcl_inventory:switch_stack", n)
+end
+
+minetest.register_on_joinplayer(function (player)
+	if get_stack_size(player) == 0 then
+		set_stack_size(player, 64)
+	end
+end)
 
 function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size, show, page, filter)
 	--reset_menu_item_bg()
@@ -325,14 +339,6 @@ function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size,
 	if name == "inv" then
 		inv_bg = "crafting_inventory_creative_survival.png"
 
-		-- Show armor and player image
-		local player_preview
-		if minetest.settings:get_bool("3d_player_preview", true) then
-			player_preview = mcl_player.get_player_formspec_model(player, 3.9, 1.4, 1.2333, 2.4666, "")
-		else
-			player_preview = "image[3.9,1.4;1.2333,2.4666;"..mcl_player.player_get_preview(player).."]"
-		end
-
 		-- Background images for armor slots (hide if occupied)
 		local armor_slot_imgs = ""
 		local inv = player:get_inventory()
@@ -349,6 +355,12 @@ function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size,
 			armor_slot_imgs = armor_slot_imgs .. "image[5.5,2.75;1,1;mcl_inventory_empty_armor_slot_boots.png]"
 		end
 
+		if inv:get_stack("offhand", 1):is_empty() then
+			armor_slot_imgs = armor_slot_imgs .. "image[1.5,2.025;1,1;mcl_inventory_empty_armor_slot_shield.png]"
+		end
+
+		local stack_size = get_stack_size(player)
+
 		-- Survival inventory slots
 		main_list = "list[current_player;main;0,3.75;9,3;9]"..
 			mcl_formspec.get_itemslot_bg(0,3.75,9,3)..
@@ -361,9 +373,11 @@ function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size,
 			mcl_formspec.get_itemslot_bg(2.5,2.75,1,1)..
 			mcl_formspec.get_itemslot_bg(5.5,1.3,1,1)..
 			mcl_formspec.get_itemslot_bg(5.5,2.75,1,1)..
+			"list[current_player;offhand;1.5,2.025;1,1]"..
+			mcl_formspec.get_itemslot_bg(1.5,2.025,1,1)..
 			armor_slot_imgs..
 			-- player preview
-			player_preview..
+			mcl_player.get_player_formspec_model(player, 3.9, 1.4, 1.2333, 2.4666, "")..
 			-- crafting guide button
 			"image_button[9,1;1,1;craftguide_book.png;__mcl_craftguide;]"..
 			"tooltip[__mcl_craftguide;"..F(S("Recipe book")).."]"..
@@ -376,7 +390,11 @@ function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size,
 			-- achievements button
 			"image_button[9,4;1,1;mcl_achievements_button.png;__mcl_achievements;]"..
 			--"style_type[image_button;border=;bgimg=;bgimg_pressed=]"..
-			"tooltip[__mcl_achievements;"..F(S("Achievements")).."]"
+			"tooltip[__mcl_achievements;"..F(S("Achievements")).."]"..
+			-- switch stack size button
+			"image_button[9,5;1,1;default_apple.png;__switch_stack;]"..
+			"label[9.4,5.4;".. F(C("#FFFFFF", stack_size ~= 1 and stack_size or "")) .."]"..
+			"tooltip[__switch_stack;"..F(S("Switch stack size")).."]"
 
 		-- For shortcuts
 		listrings = listrings ..
@@ -417,8 +435,7 @@ function mcl_inventory.set_creative_formspec(player, start_i, pagenum, inv_size,
 		return
 			"style["..this_tab..";border=false;bgimg=;bgimg_pressed=]"..
 			"item_image_button[" .. boffset[this_tab] ..";1,1;"..tab_icon[this_tab]..";"..this_tab..";]"..
-			"image[" .. offset[this_tab] .. ";1.5,1.44;" .. bg_img .. "]" ..
-			"image[" .. boffset[this_tab] .. ";1,1;crafting_creative_marker.png]"
+			"image[" .. offset[this_tab] .. ";1.5,1.44;" .. bg_img .. "]"
 	end
 	local caption = ""
 	if name ~= "inv" and filtername[name] then
@@ -545,6 +562,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	elseif fields.search and not fields.creative_next and not fields.creative_prev then
 		set_inv_search(string.lower(fields.search),player)
 		page = "nix"
+	elseif fields.__switch_stack then
+		local switch = 1
+		if get_stack_size(player) == 1 then
+			switch = 64
+		end
+		set_stack_size(player, switch)
 	end
 
 	if page then
@@ -667,4 +690,12 @@ minetest.register_on_joinplayer(function(player)
 	end
 	init(player)
 	mcl_inventory.set_creative_formspec(player, 0, 1, nil, false, "nix", "")
+end)
+
+minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
+	if minetest.is_creative_enabled(player:get_player_name()) and get_stack_size(player) == 64 and action == "put" and inventory_info.listname == "main" then
+		local stack = inventory_info.stack
+		stack:set_count(stack:get_stack_max())
+		player:get_inventory():set_stack("main", inventory_info.index, stack)
+	end
 end)

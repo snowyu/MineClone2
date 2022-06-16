@@ -3,7 +3,7 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### SPIDER
@@ -17,22 +17,17 @@ local spider = {
 	type = "monster",
 	spawn_class = "hostile",
 	passive = false,
-	hostile = true,
-	always_climb = true,
 	docile_by_day = true,
-	attack_type = "punch",
-	punch_timer_cooloff = 0.5,
-	rotate = 270,
+	attack_type = "dogfight",
+	pathfinding = 1,
 	damage = 2,
 	reach = 2,
 	hp_min = 16,
 	hp_max = 16,
-	ignores_cobwebs = true,
 	xp_min = 5,
 	xp_max = 5,
-	eye_height = 0.475,
 	armor = {fleshy = 100, arthropod = 100},
-	collisionbox = {-0.45, 0, -0.45, 0.45, 0.9, 0.45},
+	collisionbox = {-0.7, -0.01, -0.7, 0.7, 0.89, 0.7},
 	visual = "mesh",
 	mesh = "mobs_mc_spider.b3d",
 	textures = {
@@ -49,14 +44,14 @@ local spider = {
 		distance = 16,
 	},
 	walk_velocity = 1.3,
-	run_velocity = 2.75, --spider can become extremely difficult if any higher
+	run_velocity = 2.8,
 	jump = true,
 	jump_height = 4,
 	view_range = 16,
 	floats = 1,
 	drops = {
-		{name = mobs_mc.items.string, chance = 1, min = 0, max = 2, looting = "common"},
-		{name = mobs_mc.items.spider_eye, chance = 3, min = 1, max = 1, looting = "common", looting_chance_function = function(lvl)
+		{name = "mcl_mobitems:string", chance = 1, min = 0, max = 2, looting = "common"},
+		{name = "mcl_mobitems:spider_eye", chance = 3, min = 1, max = 1, looting = "common", looting_chance_function = function(lvl)
 			return 1 - 2 / (lvl + 3)
 		end},
 	},
@@ -74,7 +69,7 @@ local spider = {
 		run_end = 20,
 	},
 }
-mobs:register_mob("mobs_mc:spider", spider)
+mcl_mobs:register_mob("mobs_mc:spider", spider)
 
 -- Cave spider
 local cave_spider = table.copy(spider)
@@ -91,10 +86,10 @@ cave_spider.walk_velocity = 1.3
 cave_spider.run_velocity = 3.2
 cave_spider.sounds = table.copy(spider.sounds)
 cave_spider.sounds.base_pitch = 1.25
-mobs:register_mob("mobs_mc:cave_spider", cave_spider)
+mcl_mobs:register_mob("mobs_mc:cave_spider", cave_spider)
 
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:spider",
 "overworld",
 "ground",
@@ -244,9 +239,9 @@ mobs:spawn_specific(
 30,
 17000,
 2,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:spider", S("Spider"), "mobs_mc_spawn_icon_spider.png", 0)
-mobs:register_egg("mobs_mc:cave_spider", S("Cave Spider"), "mobs_mc_spawn_icon_cave_spider.png", 0)
+mcl_mobs:register_egg("mobs_mc:spider", S("Spider"), "mobs_mc_spawn_icon_spider.png", 0)
+mcl_mobs:register_egg("mobs_mc:cave_spider", S("Cave Spider"), "mobs_mc_spawn_icon_cave_spider.png", 0)

@@ -47,7 +47,7 @@ minetest.register_node("mcl_core:stone_with_coal", {
 	tiles = {"mcl_core_coal_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=1, building_block=1, material_stone=1, xp=1},
+	groups = {pickaxey=1, building_block=1, material_stone=1, xp=1, blast_furnace_smeltable=1},
 	drop = "mcl_core:coal_lump",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
@@ -62,7 +62,7 @@ minetest.register_node("mcl_core:stone_with_iron", {
 	tiles = {"mcl_core_iron_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=3, building_block=1, material_stone=1},
+	groups = {pickaxey=3, building_block=1, material_stone=1, blast_furnace_smeltable=1},
 	drop = "mcl_core:stone_with_iron",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
@@ -77,7 +77,7 @@ minetest.register_node("mcl_core:stone_with_gold", {
 	tiles = {"mcl_core_gold_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=4, building_block=1, material_stone=1},
+	groups = {pickaxey=4, building_block=1, material_stone=1, blast_furnace_smeltable=1},
 	drop = "mcl_core:stone_with_gold",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
@@ -97,7 +97,7 @@ minetest.register_node("mcl_core:stone_with_redstone", {
 	tiles = {"mcl_core_redstone_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=4, building_block=1, material_stone=1, xp=7},
+	groups = {pickaxey=4, building_block=1, material_stone=1, xp=7, blast_furnace_smeltable=1},
 	drop = {
 		items = {
 			max_items = 1,
@@ -137,7 +137,7 @@ minetest.register_node("mcl_core:stone_with_redstone_lit", {
 	light_source = 9,
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=4, not_in_creative_inventory=1, material_stone=1, xp=7},
+	groups = {pickaxey=4, not_in_creative_inventory=1, material_stone=1, xp=7, blast_furnace_smeltable=1},
 	drop = {
 		items = {
 			max_items = 1,
@@ -175,7 +175,7 @@ minetest.register_node("mcl_core:stone_with_lapis", {
 	tiles = {"mcl_core_lapis_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=3, building_block=1, material_stone=1, xp=6},
+	groups = {pickaxey=3, building_block=1, material_stone=1, xp=6, blast_furnace_smeltable=1},
 	drop = {
 		max_items = 1,
 		items = {
@@ -199,7 +199,7 @@ minetest.register_node("mcl_core:stone_with_emerald", {
 	tiles = {"mcl_core_emerald_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=4, building_block=1, material_stone=1, xp=6},
+	groups = {pickaxey=4, building_block=1, material_stone=1, xp=6, blast_furnace_smeltable=1},
 	drop = "mcl_core:emerald",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
@@ -214,7 +214,7 @@ minetest.register_node("mcl_core:stone_with_diamond", {
 	tiles = {"mcl_core_diamond_ore.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {pickaxey=4, building_block=1, material_stone=1, xp=4},
+	groups = {pickaxey=4, building_block=1, material_stone=1, xp=4, blast_furnace_smeltable=1},
 	drop = "mcl_core:diamond",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
@@ -365,10 +365,15 @@ minetest.register_node("mcl_core:dirt_with_grass", {
 	overlay_tiles = {"mcl_core_grass_block_top.png", "", {name="mcl_core_grass_block_side_overlay.png", tileable_vertical=false}},
 	palette = "mcl_core_palette_grass.png",
 	palette_index = 0,
-	color = "#55aa60",
+	color = "#8EB971",
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {handy=1,shovely=1,dirt=2,grass_block=1, grass_block_no_snow=1, soil=1, soil_sapling=2, soil_sugarcane=1, cultivatable=2, spreading_dirt_type=1, enderman_takable=1, building_block=1},
+	groups = {
+		handy = 1, shovely = 1, dirt = 2, grass_block = 1, grass_block_no_snow = 1,
+		soil = 1, soil_sapling = 2, soil_sugarcane = 1, cultivatable = 2,
+		spreading_dirt_type = 1, enderman_takable = 1, building_block = 1,
+		compostability = 30, path_creation_possible=1
+	},
 	drop = "mcl_core:dirt",
 	sounds = mcl_sounds.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain=0.1},
@@ -384,7 +389,7 @@ minetest.register_node("mcl_core:dirt_with_grass", {
 		return mcl_core.on_snowable_construct(pos)
 	end,
 	_mcl_snowed = "mcl_core:dirt_with_grass_snow",
-	_mcl_blast_resistance = 0.5,
+	_mcl_blast_resistance = 0.6,
 	_mcl_hardness = 0.6,
 	_mcl_silk_touch_drop = true,
 })
@@ -421,7 +426,7 @@ minetest.register_node("mcl_core:mycelium", {
 	tiles = {"mcl_core_mycelium_top.png", "default_dirt.png", {name="mcl_core_mycelium_side.png", tileable_vertical=false}},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {handy=1,shovely=1, dirt=2,spreading_dirt_type=1, enderman_takable=1, building_block=1},
+	groups = { handy = 1, shovely = 1, dirt = 2, spreading_dirt_type = 1, enderman_takable = 1,  building_block = 1, soil_sapling = 2, path_creation_possible=1},
 	drop = "mcl_core:dirt",
 	sounds = mcl_sounds.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain=0.1},
@@ -429,7 +434,7 @@ minetest.register_node("mcl_core:mycelium", {
 
 	on_construct = mcl_core.on_snowable_construct,
 	_mcl_snowed = "mcl_core:mycelium_snow",
-	_mcl_blast_resistance = 0.5,
+	_mcl_blast_resistance = 0.6,
 	_mcl_hardness = 0.6,
 	_mcl_silk_touch_drop = true,
 })
@@ -441,13 +446,13 @@ minetest.register_node("mcl_core:podzol", {
 	tiles = {"mcl_core_dirt_podzol_top.png", "default_dirt.png", {name="mcl_core_dirt_podzol_side.png", tileable_vertical=false}},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {handy=1,shovely=3, dirt=2,soil=1, soil_sapling=2, soil_sugarcane=1, enderman_takable=1, building_block=1},
+	groups = {handy=1,shovely=3, dirt=2,soil=1, soil_sapling=2, soil_sugarcane=1, enderman_takable=1, building_block=1,path_creation_possible=1},
 	drop = "mcl_core:dirt",
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	on_construct = mcl_core.on_snowable_construct,
 	_mcl_snowed = "mcl_core:podzol_snow",
-	_mcl_blast_resistance = 0.5,
-	_mcl_hardness = 0.6,
+	_mcl_blast_resistance = 0.8,
+	_mcl_hardness = 0.8,
 	_mcl_silk_touch_drop = true,
 })
 mcl_core.register_snowed_node("mcl_core:podzol_snow", "mcl_core:podzol", nil, nil, false, S("Podzol with Snow"))
@@ -459,7 +464,7 @@ minetest.register_node("mcl_core:dirt", {
 	tiles = {"default_dirt.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {handy=1,shovely=1, dirt=1,soil=1, soil_sapling=2, soil_sugarcane=1, cultivatable=2, enderman_takable=1, building_block=1},
+	groups = {handy=1,shovely=1, dirt=1,soil=1, soil_sapling=2, soil_sugarcane=1, cultivatable=2, enderman_takable=1, building_block=1, path_creation_possible=1},
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	_mcl_blast_resistance = 0.5,
 	_mcl_hardness = 0.5,
@@ -471,7 +476,7 @@ minetest.register_node("mcl_core:coarse_dirt", {
 	tiles = {"mcl_core_coarse_dirt.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {handy=1,shovely=1, dirt=3,soil=1, soil_sugarcane=1, cultivatable=1, enderman_takable=1, building_block=1},
+	groups = { handy = 1,shovely = 1, dirt = 3, soil = 1, soil_sugarcane = 1, cultivatable = 1, enderman_takable = 1, building_block = 1, soil_sapling = 2, path_creation_possible=1},
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	_mcl_blast_resistance = 0.5,
 	_mcl_hardness = 0.5,
@@ -551,8 +556,8 @@ minetest.register_node("mcl_core:sandstonesmooth", {
 	stack_max = 64,
 	groups = {pickaxey=1, sandstone=1, normal_sandstone=1, building_block=1, material_stone=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
-	_mcl_blast_resistance = 0.8,
-	_mcl_hardness = 0.8,
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 2,
 })
 
 minetest.register_node("mcl_core:sandstonecarved", {
@@ -576,8 +581,8 @@ minetest.register_node("mcl_core:sandstonesmooth2", {
 	stack_max = 64,
 	groups = {pickaxey=1, sandstone=1, normal_sandstone=1, building_block=1, material_stone=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
-	_mcl_blast_resistance = 0.8,
-	_mcl_hardness = 0.8,
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 2,
 })
 
 -- red sandstone --
@@ -719,7 +724,7 @@ minetest.register_node("mcl_core:cobble", {
 	tiles = {"default_cobble.png"},
 	is_ground_content = false,
 	stack_max = 64,
-	groups = {pickaxey=1, building_block=1, material_stone=1},
+	groups = {pickaxey=1, building_block=1, material_stone=1, cobble=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 6,
 	_mcl_hardness = 2,
@@ -770,7 +775,7 @@ minetest.register_node("mcl_core:goldblock", {
 	groups = {pickaxey=4, building_block=1},
 	sounds = mcl_sounds.node_sound_metal_defaults(),
 	_mcl_blast_resistance = 6,
-	_mcl_hardness = 5,
+	_mcl_hardness = 3,
 })
 
 minetest.register_node("mcl_core:diamondblock", {
@@ -1057,8 +1062,8 @@ minetest.register_node("mcl_core:snowblock", {
 	on_construct = mcl_core.on_snow_construct,
 	after_destruct = mcl_core.after_snow_destruct,
 	drop = "mcl_throwing:snowball 4",
-	_mcl_blast_resistance = 0.2,
-	_mcl_hardness = 0.2,
+	_mcl_blast_resistance = 0.1,
+	_mcl_hardness = 0.1,
 	_mcl_silk_touch_drop = true,
 })
 
@@ -1068,4 +1073,3 @@ if minetest.get_modpath("doc") then
 	doc.add_entry_alias("nodes", "mcl_core:water_source", "nodes", "mcl_core:water_flowing")
 	doc.add_entry_alias("nodes", "mcl_core:lava_source", "nodes", "mcl_core:lava_flowing")
 end
-

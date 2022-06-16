@@ -1,6 +1,6 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### SHEEP
@@ -8,21 +8,22 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 local colors = {
 	-- group = { wool, textures }
-	unicolor_white = { mobs_mc.items.wool_white, "#FFFFFF00" },
-	unicolor_dark_orange = { mobs_mc.items.wool_brown, "#502A00D0" },
-	unicolor_grey = { mobs_mc.items.wool_light_grey, "#5B5B5BD0" },
-	unicolor_darkgrey = { mobs_mc.items.wool_grey, "#303030D0" },
-	unicolor_blue = { mobs_mc.items.wool_blue, "#0000CCD0" },
-	unicolor_dark_green = { mobs_mc.items.wool_green, "#005000D0" },
-	unicolor_green = { mobs_mc.items.wool_lime, "#50CC00D0" },
-	unicolor_violet = { mobs_mc.items.wool_purple , "#5000CCD0" },
-	unicolor_light_red = { mobs_mc.items.wool_pink, "#FF5050D0" },
-	unicolor_yellow = { mobs_mc.items.wool_yellow, "#CCCC00D0" },
-	unicolor_orange = { mobs_mc.items.wool_orange, "#CC5000D0" },
-	unicolor_red = { mobs_mc.items.wool_red, "#CC0000D0" },
-	unicolor_cyan  = { mobs_mc.items.wool_cyan, "#00CCCCD0" },
-	unicolor_red_violet = { mobs_mc.items.wool_magenta, "#CC0050D0" },
-	unicolor_black = { mobs_mc.items.wool_black, "#000000D0" },
+	unicolor_white = { "mcl_wool:white", "#FFFFFF00" },
+	unicolor_dark_orange = { "mcl_wool:brown", "#502A00D0" },
+	unicolor_grey = { "mcl_wool:silver", "#5B5B5BD0" },
+	unicolor_darkgrey = { "mcl_wool:grey", "#303030D0" },
+	unicolor_blue = { "mcl_wool:blue", "#0000CCD0" },
+	unicolor_dark_green = { "mcl_wool:green", "#005000D0" },
+	unicolor_green = { "mcl_wool:lime", "#50CC00D0" },
+	unicolor_violet = { "mcl_wool:purple" , "#5000CCD0" },
+	unicolor_light_red = { "mcl_wool:pink", "#FF5050D0" },
+	unicolor_yellow = { "mcl_wool:yellow", "#CCCC00D0" },
+	unicolor_orange = { "mcl_wool:orange", "#CC5000D0" },
+	unicolor_red = { "mcl_wool:red", "#CC0000D0" },
+	unicolor_cyan  = { "mcl_wool:cyan", "#00CCCCD0" },
+	unicolor_red_violet = { "mcl_wool:magenta", "#CC0050D0" },
+	unicolor_black = { "mcl_wool:black", "#000000D0" },
+	unicolor_light_blue = { "mcl_wool:light_blue", "#5050FFD0" },
 }
 
 local rainbow_colors = {
@@ -38,10 +39,6 @@ local rainbow_colors = {
 	"unicolor_red_violet"
 }
 
-if minetest.get_modpath("mcl_wool") then
-	colors["unicolor_light_blue"] = { mobs_mc.items.wool_light_blue, "#5050FFD0" }
-end
-
 local sheep_texture = function(color_group)
 	if not color_group then
 		color_group = "unicolor_white"
@@ -55,7 +52,7 @@ end
 local gotten_texture = { "blank.png", "mobs_mc_sheep.png" }
 
 --mcsheep
-mobs:register_mob("mobs_mc:sheep", {
+mcl_mobs:register_mob("mobs_mc:sheep", {
 	description = S("Sheep"),
 	type = "animal",
 	spawn_class = "passive",
@@ -63,13 +60,8 @@ mobs:register_mob("mobs_mc:sheep", {
 	hp_max = 8,
 	xp_min = 1,
 	xp_max = 3,
-	skittish = true,
-	breed_distance = 1.5,
-	baby_size = 0.5,
-	follow_distance = 2,
-	follow = mobs_mc.items.wheat,
 	collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.29, 0.45},
-	rotate = 270,
+
 	visual = "mesh",
 	visual_size = {x=3, y=3},
 	mesh = "mobs_mc_sheepfur.b3d",
@@ -78,25 +70,8 @@ mobs:register_mob("mobs_mc:sheep", {
 	color = "unicolor_white",
 	makes_footstep_sound = true,
 	walk_velocity = 1,
-	run_velocity = 3,
-
-	--head code
-	has_head = true,
-	head_bone = "head",
-
-	swap_y_with_x = false,
-	reverse_head_yaw = false,
-
-	head_bone_pos_y = 3.6,
-	head_bone_pos_z = -0.6,
-
-	head_height_offset = 1.0525,
-	head_direction_offset = 0.5,
-	head_pitch_modifier = 0,
-	--end head code
-
 	drops = {
-		{name = mobs_mc.items.mutton_raw,
+		{name = "mcl_mobitems:mutton",
 		chance = 1,
 		min = 1,
 		max = 2,
@@ -121,11 +96,15 @@ mobs:register_mob("mobs_mc:sheep", {
 		walk_start = 0,		walk_end = 40,
 		run_start = 0,		run_end = 40,
 	},
+	follow = { "mcl_farming:wheat_item" },
 	view_range = 12,
 
 	-- Eat grass
 	replace_rate = 20,
-	replace_what = mobs_mc.replace.sheep,
+	replace_what = {
+		{ "mcl_core:dirt_with_grass", "mcl_core:dirt", -1 },
+		{ "mcl_flowers:tallgrass", "air", 0 },
+	},
 	-- Properly regrow wool after eating grass
 	on_replace = function(self, pos, oldnode, newnode)
 		if not self.color or not colors[self.color] then
@@ -135,7 +114,7 @@ mobs:register_mob("mobs_mc:sheep", {
 		self.base_texture = sheep_texture(self.color)
 		self.object:set_properties({ textures = self.base_texture })
 		self.drops = {
-			{name = mobs_mc.items.mutton_raw,
+			{name = "mcl_mobitems:mutton",
 			chance = 1,
 			min = 1,
 			max = 2,},
@@ -150,6 +129,7 @@ mobs:register_mob("mobs_mc:sheep", {
 	do_custom = function(self, dtime)
 		if not self.initial_color_set then
 			local r = math.random(0,100000)
+			local textures
 			if r <= 81836 then
 				-- 81.836%
 				self.color = "unicolor_white"
@@ -172,7 +152,7 @@ mobs:register_mob("mobs_mc:sheep", {
 			self.base_texture = sheep_texture(self.color)
 			self.object:set_properties({ textures = self.base_texture })
 			self.drops = {
-				{name = mobs_mc.items.mutton_raw,
+				{name = "mcl_mobitems:mutton",
 				chance = 1,
 				min = 1,
 				max = 2,},
@@ -215,18 +195,10 @@ mobs:register_mob("mobs_mc:sheep", {
 	on_rightclick = function(self, clicker)
 		local item = clicker:get_wielded_item()
 
-		--attempt to enter breed state
-		if mobs.enter_breed_state(self,clicker) then
-			return
-		end
+		if mcl_mobs:feed_tame(self, clicker, 1, true, true) then return end
+		if mcl_mobs:protect(self, clicker) then return end
 
-		--make baby grow faster
-		if self.baby then
-			mobs.make_baby_grow_faster(self,clicker)
-			return
-		end
-
-		if item:get_name() == mobs_mc.items.shears and not self.gotten and not self.child then
+		if item:get_name() == "mcl_tools:shears" and not self.gotten and not self.child then
 			self.gotten = true
 			local pos = self.object:get_pos()
 			minetest.sound_play("mcl_tools_shears_cut", {pos = pos}, true)
@@ -240,11 +212,11 @@ mobs:register_mob("mobs_mc:sheep", {
 				textures = self.base_texture,
 			})
 			if not minetest.is_creative_enabled(clicker:get_player_name()) then
-				item:add_wear(mobs_mc.misc.shears_wear)
+				item:add_wear(mobs_mc.shears_wear)
 				clicker:get_inventory():set_stack("main", clicker:get_wield_index(), item)
 			end
 			self.drops = {
-				{name = mobs_mc.items.mutton_raw,
+				{name = "mcl_mobitems:mutton",
 				chance = 1,
 				min = 1,
 				max = 2,},
@@ -266,7 +238,7 @@ mobs:register_mob("mobs_mc:sheep", {
 					})
 					self.color = group
 					self.drops = {
-						{name = mobs_mc.items.mutton_raw,
+						{name = "mcl_mobitems:mutton",
 						chance = 1,
 						min = 1,
 						max = 2,},
@@ -280,11 +252,12 @@ mobs:register_mob("mobs_mc:sheep", {
 			end
 			return
 		end
+		if mcl_mobs:capture_mob(self, clicker, 0, 5, 70, false, nil) then return end
 	end,
 	on_breed = function(parent1, parent2)
 		-- Breed sheep and choose a fur color for the child.
 		local pos = parent1.object:get_pos()
-		local child = mobs:spawn_child(pos, parent1.name)
+		local child = mcl_mobs:spawn_child(pos, parent1.name)
 		if child then
 			local ent_c = child:get_luaentity()
 			local color1 = parent1.color
@@ -331,67 +304,55 @@ mobs:register_mob("mobs_mc:sheep", {
 		end
 	end,
 })
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:sheep",
 "overworld",
 "ground",
 {
-	"FlowerForest_beach",
-	"Forest_beach",
-	"StoneBeach",
-	"ColdTaiga_beach_water",
-	"Taiga_beach",
-	"Savanna_beach",
-	"Plains_beach",
-	"ExtremeHills_beach",
-	"ColdTaiga_beach",
-	"Swampland_shore",
-	"JungleM_shore",
-	"Jungle_shore",
-	"MesaPlateauFM_sandlevel",
-	"MesaPlateauF_sandlevel",
-	"MesaBryce_sandlevel",
-	"Mesa_sandlevel",
-	"Mesa",
-	"FlowerForest",
-	"Swampland",
-	"Taiga",
-	"ExtremeHills",
-	"Jungle",
-	"Savanna",
-	"BirchForest",
-	"MegaSpruceTaiga",
-	"MegaTaiga",
-	"ExtremeHills+",
-	"Forest",
-	"Plains",
-	"Desert",
-	"ColdTaiga",
+	"flat",
 	"IcePlainsSpikes",
-	"SunflowerPlains",
-	"IcePlains",
-	"RoofedForest",
-	"ExtremeHills+_snowtop",
-	"MesaPlateauFM_grasstop",
-	"JungleEdgeM",
+	"ColdTaiga",
+	"ColdTaiga_beach",
+	"ColdTaiga_beach_water",
+	"MegaTaiga",
+	"MegaSpruceTaiga",
+	"ExtremeHills",
+	"ExtremeHills_beach",
 	"ExtremeHillsM",
-	"JungleM",
+	"ExtremeHills+",
+	"ExtremeHills+_snowtop",
+	"StoneBeach",
+	"Plains",
+	"Plains_beach",
+	"SunflowerPlains",
+	"Taiga",
+	"Taiga_beach",
+	"Forest",
+	"Forest_beach",
+	"FlowerForest",
+	"FlowerForest_beach",
+	"BirchForest",
 	"BirchForestM",
-	"MesaPlateauF",
-	"MesaPlateauFM",
-	"MesaPlateauF_grasstop",
-	"MesaBryce",
-	"JungleEdge",
+	"RoofedForest",
+	"Savanna",
+	"Savanna_beach",
 	"SavannaM",
+	"Jungle",
+	"Jungle_shore",
+	"JungleM",
+	"JungleM_shore",
+	"JungleEdge",
+	"JungleEdgeM",
+	"Swampland",
+	"Swampland_shore"
 },
 0,
 minetest.LIGHT_MAX+1,
 30,
 15000,
 3,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:sheep", S("Sheep"), "mobs_mc_spawn_icon_sheep.png", 0)
-
+mcl_mobs:register_egg("mobs_mc:sheep", S("Sheep"), "mobs_mc_spawn_icon_sheep.png", 0)

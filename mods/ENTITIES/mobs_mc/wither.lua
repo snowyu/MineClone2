@@ -3,13 +3,13 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### WITHER
 --###################
 
-mobs:register_mob("mobs_mc:wither", {
+mcl_mobs:register_mob("mobs_mc:wither", {
 	description = S("Wither"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -26,6 +26,7 @@ mobs:register_mob("mobs_mc:wither", {
 		{"mobs_mc_wither.png"},
 	},
 	visual_size = {x=4, y=4},
+	makes_footstep_sound = true,
 	view_range = 16,
 	fear_height = 4,
 	walk_velocity = 2,
@@ -45,14 +46,14 @@ mobs:register_mob("mobs_mc:wither", {
 	attack_animals = true,
 	can_despawn = false,
 	drops = {
-		{name = mobs_mc.items.nether_star,
+		{name = "mcl_mobitems:nether_star",
 		chance = 1,
 		min = 1,
 		max = 1},
 	},
 	lava_damage = 0,
 	fire_damage = 0,
-	attack_type = "projectile",
+	attack_type = "dogshoot",
 	explosion_strength = 8,
 	dogshoot_stop = true,
 	arrow = "mobs_mc:wither_skull",
@@ -80,9 +81,9 @@ mobs:register_mob("mobs_mc:wither", {
 	end,
 })
 
---local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
+local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
 
-mobs:register_arrow("mobs_mc:wither_skull", {
+mcl_mobs:register_arrow("mobs_mc:wither_skull", {
 	visual = "sprite",
 	visual_size = {x = 0.75, y = 0.75},
 	-- TODO: 3D projectile, replace tetxture
@@ -95,7 +96,7 @@ mobs:register_arrow("mobs_mc:wither_skull", {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 8},
 		}, nil)
-		mobs:boom(self, self.object:get_pos(), 1)
+		mcl_mobs:boom(self, self.object:get_pos(), 1)
 	end,
 
 	hit_mob = function(self, mob)
@@ -103,17 +104,17 @@ mobs:register_arrow("mobs_mc:wither_skull", {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 8},
 		}, nil)
-		mobs:boom(self, self.object:get_pos(), 1)
+		mcl_mobs:boom(self, self.object:get_pos(), 1)
 	end,
 
 	-- node hit, explode
 	hit_node = function(self, pos, node)
-		mobs:boom(self, pos, 1)
+		mcl_mobs:boom(self, pos, 1)
 	end
 })
 -- TODO: Add blue wither skull
 
 --Spawn egg
-mobs:register_egg("mobs_mc:wither", S("Wither"), "mobs_mc_spawn_icon_wither.png", 0, true)
+mcl_mobs:register_egg("mobs_mc:wither", S("Wither"), "mobs_mc_spawn_icon_wither.png", 0, true)
 
 mcl_wip.register_wip_item("mobs_mc:wither")

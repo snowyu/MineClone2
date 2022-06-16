@@ -3,13 +3,13 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### VEX
 --###################
 
-mobs:register_mob("mobs_mc:vex", {
+mcl_mobs:register_mob("mobs_mc:vex", {
 	description = S("Vex"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -36,6 +36,7 @@ mobs:register_mob("mobs_mc:vex", {
 	view_range = 16,
 	walk_velocity = 3.2,
 	run_velocity = 5.9,
+	attack_type = "dogfight",
 	sounds = {
 		-- TODO: random
 		death = "mobs_mc_vex_death",
@@ -93,4 +94,4 @@ mobs:register_mob("mobs_mc:vex", {
 
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:vex", S("Vex"), "mobs_mc_spawn_icon_vex.png", 0)
+mcl_mobs:register_egg("mobs_mc:vex", S("Vex"), "mobs_mc_spawn_icon_vex.png", 0)

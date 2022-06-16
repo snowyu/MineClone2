@@ -1,6 +1,6 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 local rabbit = {
 	description = S("Rabbit"),
@@ -8,7 +8,7 @@ local rabbit = {
 	spawn_class = "passive",
 	passive = true,
 	reach = 1,
-	rotate = 270,
+
 	hp_min = 3,
 	hp_max = 3,
 	xp_min = 1,
@@ -42,9 +42,9 @@ local rabbit = {
 	runaway = true,
 	jump = true,
 	drops = {
-		{name = mobs_mc.items.rabbit_raw, chance = 1, min = 0, max = 1, looting = "common",},
-		{name = mobs_mc.items.rabbit_hide, chance = 1, min = 0, max = 1, looting = "common",},
-		{name = mobs_mc.items.rabbit_foot, chance = 10, min = 0, max = 1, looting = "rare", looting_factor = 0.03,},
+		{name = "mcl_mobitems:rabbit", chance = 1, min = 0, max = 1, looting = "common",},
+		{name = "mcl_mobitems:rabbit_hide", chance = 1, min = 0, max = 1, looting = "common",},
+		{name = "mcl_mobitems:rabbit_foot", chance = 10, min = 0, max = 1, looting = "rare", looting_factor = 0.03,},
 	},
 	fear_height = 4,
 	animation = {
@@ -54,14 +54,29 @@ local rabbit = {
 		run_start = 0,		run_end = 20,
 	},
 	-- Follow (yellow) dangelions, carrots and golden carrots
-	follow = mobs_mc.follow.rabbit,
+	follow = {
+		"mcl_flowers:dandelion",
+		"mcl_farming:carrot_item",
+		"mcl_farming:carrot_item_gold",
+	},
 	view_range = 8,
 	-- Eat carrots and reduce their growth stage by 1
 	replace_rate = 10,
-	replace_what = mobs_mc.replace.rabbit,
+	replace_what = {
+		{"mcl_farming:carrot", "mcl_farming:carrot_7", 0},
+		{"mcl_farming:carrot_7", "mcl_farming:carrot_6", 0},
+		{"mcl_farming:carrot_6", "mcl_farming:carrot_5", 0},
+		{"mcl_farming:carrot_5", "mcl_farming:carrot_4", 0},
+		{"mcl_farming:carrot_4", "mcl_farming:carrot_3", 0},
+		{"mcl_farming:carrot_3", "mcl_farming:carrot_2", 0},
+		{"mcl_farming:carrot_2", "mcl_farming:carrot_1", 0},
+		{"mcl_farming:carrot_1", "air", 0},
+	},
 	on_rightclick = function(self, clicker)
 		-- Feed, tame protect or capture
-		if mobs:feed_tame(self, clicker, 1, true, true) then return end
+		if mcl_mobs:feed_tame(self, clicker, 1, true, true) then return end
+		if mcl_mobs:protect(self, clicker) then return end
+		if mcl_mobs:capture_mob(self, clicker, 0, 50, 80, false, nil) then return end
 	end,
 	do_custom = function(self)
 		-- Easter egg: Change texture if rabbit is named “Toast”
@@ -78,7 +93,7 @@ local rabbit = {
 	end,
 }
 
-mobs:register_mob("mobs_mc:rabbit", rabbit)
+mcl_mobs:register_mob("mobs_mc:rabbit", rabbit)
 
 -- The killer bunny (Only with spawn egg)
 local killer_bunny = table.copy(rabbit)
@@ -99,76 +114,44 @@ killer_bunny.on_rightclick = nil
 killer_bunny.run_velocity = 6
 killer_bunny.do_custom = function(self)
 	if not self._killer_bunny_nametag_set then
-		self.nametag = S("The Killer Bunny")
+		self.nametag = "The Killer Bunny"
 		self._killer_bunny_nametag_set = true
 	end
 end
 
-mobs:register_mob("mobs_mc:killer_bunny", killer_bunny)
+mcl_mobs:register_mob("mobs_mc:killer_bunny", killer_bunny)
 
 -- Mob spawning rules.
 -- Different skins depending on spawn location <- we'll get to this when the spawning algorithm is fleshed out
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:rabbit",
 "overworld",
 "ground",
 {
-	"FlowerForest_beach",
-	"Forest_beach",
-	"StoneBeach",
-	"ColdTaiga_beach_water",
-	"Taiga_beach",
-	"Savanna_beach",
-	"Plains_beach",
-	"ExtremeHills_beach",
-	"ColdTaiga_beach",
-	"Swampland_shore",
-	"JungleM_shore",
-	"Jungle_shore",
-	"MesaPlateauFM_sandlevel",
-	"MesaPlateauF_sandlevel",
-	"MesaBryce_sandlevel",
-	"Mesa_sandlevel",
-	"Mesa",
-	"FlowerForest",
-	"Swampland",
-	"Taiga",
-	"ExtremeHills",
-	"Jungle",
-	"Savanna",
-	"BirchForest",
-	"MegaSpruceTaiga",
-	"MegaTaiga",
-	"ExtremeHills+",
-	"Forest",
-	"Plains",
-	"Desert",
-	"ColdTaiga",
-	"IcePlainsSpikes",
-	"SunflowerPlains",
-	"IcePlains",
-	"RoofedForest",
-	"ExtremeHills+_snowtop",
-	"MesaPlateauFM_grasstop",
-	"JungleEdgeM",
-	"ExtremeHillsM",
-	"JungleM",
-	"BirchForestM",
-	"MesaPlateauF",
-	"MesaPlateauFM",
-	"MesaPlateauF_grasstop",
-	"MesaBryce",
-	"JungleEdge",
-	"SavannaM",
+"Desert",
+"FlowerForest",
+"Taiga",
+"ExtremeHills",
+"BirchForest",
+"MegaSpruceTaiga",
+"MegaTaiga",
+"ExtremeHills+",
+"Plains",
+"ColdTaiga",
+"SunflowerPlains",
+"RoofedForest",
+"MesaPlateauFM_grasstop",
+"ExtremeHillsM",
+"BirchForestM",
 },
 9,
 minetest.LIGHT_MAX+1,
 30,
 15000,
 8,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 --[[
 local spawn = {
@@ -178,21 +161,21 @@ local spawn = {
 	active_object_count = 10,
 	min_light = 0,
 	max_light = minetest.LIGHT_MAX+1,
-	min_height = mobs_mc.spawn_height.overworld_min,
-	max_height = mobs_mc.spawn_height.overworld_max,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mcl_vars.mg_overworld_max,
 }
 
 local spawn_desert = table.copy(spawn)
-spawn_desert.nodes = mobs_mc.spawn.desert
+spawn_desert.nodes = { "mcl_core:sand", "mcl_core:sandstone" }
 spawn_desert.on_spawn = function(self, pos)
 	local texture = "mobs_mc_rabbit_gold.png"
 	self.base_texture = { "mobs_mc_rabbit_gold.png" }
 	self.object:set_properties({textures = self.base_texture})
 end
-mobs:spawn(spawn_desert)
+mcl_mobs:spawn(spawn_desert)
 
 local spawn_snow = table.copy(spawn)
-spawn_snow.nodes = mobs_mc.spawn.snow
+spawn_snow.nodes = { "mcl_core:snow", "mcl_core:snowblock", "mcl_core:dirt_with_grass_snow" }
 spawn_snow.on_spawn = function(self, pos)
 	local texture
 	local r = math.random(1, 100)
@@ -206,10 +189,10 @@ spawn_snow.on_spawn = function(self, pos)
 	self.base_texture = { texture }
 	self.object:set_properties({textures = self.base_texture})
 end
-mobs:spawn(spawn_snow)
+mcl_mobs:spawn(spawn_snow)
 
 local spawn_grass = table.copy(spawn)
-spawn_grass.nodes = mobs_mc.spawn.grassland
+spawn_grass.nodes = { "mcl_core:dirt_with_grass" }
 spawn_grass.on_spawn = function(self, pos)
 	local texture
 	local r = math.random(1, 100)
@@ -226,11 +209,11 @@ spawn_grass.on_spawn = function(self, pos)
 	self.base_texture = { texture }
 	self.object:set_properties({textures = self.base_texture})
 end
-mobs:spawn(spawn_grass)
+mcl_mobs:spawn(spawn_grass)
 ]]--
 
 -- Spawn egg
-mobs:register_egg("mobs_mc:rabbit", S("Rabbit"), "mobs_mc_spawn_icon_rabbit.png", 0)
+mcl_mobs:register_egg("mobs_mc:rabbit", S("Rabbit"), "mobs_mc_spawn_icon_rabbit.png", 0)
 
 -- Note: This spawn egg does not exist in Minecraft
-mobs:register_egg("mobs_mc:killer_bunny", S("Killer Bunny"), "mobs_mc_spawn_icon_rabbit_caerbannog.png", 0) 
+mcl_mobs:register_egg("mobs_mc:killer_bunny", S("Killer Bunny"), "mobs_mc_spawn_icon_rabbit.png^[colorize:#FF0000:192", 0) -- TODO: Update inventory image

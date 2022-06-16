@@ -3,24 +3,21 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### IRON GOLEM
 --###################
 
+local etime = 0
 
-
-mobs:register_mob("mobs_mc:iron_golem", {
+mcl_mobs:register_mob("mobs_mc:iron_golem", {
 	description = S("Iron Golem"),
 	type = "npc",
 	spawn_class = "passive",
 	passive = true,
-	rotate = 270,
 	hp_min = 100,
 	hp_max = 100,
-	protect = true,
-	neutral = true,
 	breath_max = -1,
 	collisionbox = {-0.7, -0.01, -0.7, 0.7, 2.69, 0.7},
 	visual = "mesh",
@@ -40,16 +37,37 @@ mobs:register_mob("mobs_mc:iron_golem", {
 	run_velocity = 1.2,
 	-- Approximation
 	damage = 14,
+	knock_back = false,
 	reach = 3,
 	group_attack = true,
 	attacks_monsters = true,
-	attack_type = "punch",
+	attack_type = "dogfight",
+	_got_poppy = false,
+	pick_up = {"mcl_flowers:poppy"},
+	on_pick_up = function(self,n)
+		if n.itemstring:find("mcl_flowers:poppy") then
+			if not self._got_poppy then
+				self._got_poppy=true
+				return
+			end
+			return true
+		end
+	end,
+	replace_what = {"mcl_flowers:poppy"},
+	replace_with = {"air"},
+	on_replace = function(self, pos, oldnode, newnode)
+		if not self.got_poppy and oldnode.name == "mcl_flowers:poppy" then
+			self._got_poppy=true
+			return
+		end
+		return false
+	end,
 	drops = {
-		{name = mobs_mc.items.iron_ingot,
+		{name = "mcl_core:iron_ingot",
 		chance = 1,
 		min = 3,
 		max = 5,},
-		{name = mobs_mc.items.poppy,
+		{name = "mcl_flowers:poppy",
 		chance = 1,
 		min = 0,
 		max = 2,},
@@ -63,11 +81,19 @@ mobs:register_mob("mobs_mc:iron_golem", {
 		punch_start = 40,  punch_end = 50,
 	},
 	jump = true,
+	on_step = function(self,dtime)
+		etime = etime + dtime
+		if etime > 10 then
+			if self._home and vector.distance(self._home,self.object:get_pos()) > 50 then
+				mcl_mobs:gopath(self,self._home)
+			end
+		end
+	end,
 })
 
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:iron_golem", S("Iron Golem"), "mobs_mc_spawn_icon_iron_golem.png", 0)
+mcl_mobs:register_egg("mobs_mc:iron_golem", S("Iron Golem"), "mobs_mc_spawn_icon_iron_golem.png", 0)
 
 
 --[[ This is to be called when a pumpkin or jack'o lantern has been placed. Recommended: In the on_construct function of the node.
@@ -82,7 +108,7 @@ I = Iron block
 . = Air
 ]]
 
-mobs_mc.tools.check_iron_golem_summon = function(pos)
+function mobs_mc.check_iron_golem_summon(pos)
 	local checks = {
 		-- These are the possible placement patterns, with offset from the pumpkin block.
 		-- These tables include the positions of the iron blocks (1-4) and air blocks (5-8)
@@ -140,7 +166,7 @@ mobs_mc.tools.check_iron_golem_summon = function(pos)
 		for i=1, 4 do
 			local cpos = vector.add(pos, checks[c][i])
 			local node = minetest.get_node(cpos)
-			if node.name ~= mobs_mc.items.iron_block then
+			if node.name ~= "mcl_core:ironblock" then
 				ok = false
 				break
 			end
@@ -158,11 +184,11 @@ mobs_mc.tools.check_iron_golem_summon = function(pos)
 		if ok then
 			-- Remove the nodes
 			minetest.remove_node(pos)
-			minetest.check_for_falling(pos)
+			core.check_for_falling(pos)
 			for i=1, 4 do
 				local cpos = vector.add(pos, checks[c][i])
 				minetest.remove_node(cpos)
-				minetest.check_for_falling(cpos)
+				core.check_for_falling(cpos)
 			end
 			-- Summon iron golem
 			local place

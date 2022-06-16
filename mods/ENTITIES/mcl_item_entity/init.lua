@@ -78,7 +78,6 @@ local function enable_physics(object, luaentity, ignore_check)
 		object:set_properties({
 			physical = true
 		})
-		object:set_velocity({x=0,y=0,z=0})
 		object:set_acceleration({x=0,y=-get_gravity(),z=0})
 	end
 end
@@ -110,7 +109,7 @@ minetest.register_globalstep(function(dtime)
 			if tick == true and pool[name] > 0 then
 				minetest.sound_play("item_drop_pickup", {
 					pos = pos,
-					gain = 0.7,
+					gain = 0.3,
 					max_hear_distance = 16,
 					pitch = math.random(70,110)/100
 				})
@@ -256,6 +255,8 @@ function minetest.handle_node_drops(pos, drops, digger)
 
 	local silk_touch_drop = false
 	local nodedef = minetest.registered_nodes[dug_node.name]
+	if not nodedef then return end
+
 	if shearsy_level and shearsy_level > 0 and nodedef._mcl_shears_drop then
 		if nodedef._mcl_shears_drop == true then
 			drops = { dug_node.name }
@@ -290,10 +291,10 @@ function minetest.handle_node_drops(pos, drops, digger)
 		end
 	end
 
-	if digger and mcl_experience.throw_experience and not silk_touch_drop then
+	if digger and mcl_experience.throw_xp and not silk_touch_drop then
 		local experience_amount = minetest.get_item_group(dug_node.name,"xp")
 		if experience_amount > 0 then
-			mcl_experience.throw_experience(pos, experience_amount)
+			mcl_experience.throw_xp(pos, experience_amount)
 		end
 	end
 
@@ -416,7 +417,11 @@ minetest.register_entity(":__builtin:item", {
 		end
 		local stack = ItemStack(itemstring)
 		if minetest.get_item_group(stack:get_name(), "compass") > 0 then
-			stack:set_name("mcl_compass:16")
+			if string.find(stack:get_name(), "_lodestone") then
+				stack:set_name("mcl_compass:18_lodestone")
+			else
+				stack:set_name("mcl_compass:18")
+			end
 			itemstring = stack:to_string()
 			self.itemstring = itemstring
 		end
@@ -768,8 +773,8 @@ minetest.register_entity(":__builtin:item", {
 			return
 		end
 
-		-- Move item around on flowing liquids
-		if def and def.liquidtype == "flowing" then
+		-- Move item around on flowing liquids; add 'source' check to allow items to continue flowing a bit in the source block of flowing water.
+		if def and def.liquidtype == "flowing" or def.liquidtype == "source" then
 
 			--[[ Get flowing direction (function call from flowlib), if there's a liquid.
 			NOTE: According to Qwertymine, flowlib.quickflow is only reliable for liquids with a flowing distance of 7.
@@ -778,11 +783,11 @@ minetest.register_entity(":__builtin:item", {
 			-- Just to make sure we don't manipulate the speed for no reason
 			if vec.x ~= 0 or vec.y ~= 0 or vec.z ~= 0 then
 				-- Minecraft Wiki: Flowing speed is "about 1.39 meters per second"
-				local f = 1.39
+				local f = 1.2
 				-- Set new item moving speed into the direciton of the liquid
 				local newv = vector.multiply(vec, f)
-				self.object:set_acceleration({x = 0, y = 0, z = 0})
-				self.object:set_velocity({x = newv.x, y = -0.22, z = newv.z})
+				-- Swap to acceleration instead of a static speed to better mimic MC mechanics.
+				self.object:set_acceleration({x = newv.x, y = -0.22, z = newv.z})
 
 				self.physical_state = true
 				self._flowing = true
@@ -802,7 +807,7 @@ minetest.register_entity(":__builtin:item", {
 		local nn = minetest.get_node({x=p.x, y=p.y-0.5, z=p.z}).name
 		local v = self.object:get_velocity()
 
-		if not minetest.registered_nodes[nn] or minetest.registered_nodes[nn].walkable and v.y == 0 then
+		if not minetest.registered_nodes[nn] or minetest.registered_nodes[nn].walkable and not minetest.registered_nodes[nn].groups.slippery and v.y == 0 then
 			if self.physical_state then
 				local own_stack = ItemStack(self.object:get_luaentity().itemstring)
 				-- Merge with close entities of the same item

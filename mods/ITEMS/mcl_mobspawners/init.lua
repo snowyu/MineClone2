@@ -155,7 +155,7 @@ local function spawn_mobs(pos, elapsed)
 	end
 
 	-- are we spawning a registered mob?
-	if not mobs.spawning_mobs[mob] then
+	if not mcl_mobs.spawning_mobs[mob] then
 		minetest.log("error", "[mcl_mobspawners] Mob Spawner: Mob doesn't exist: "..mob)
 		return
 	end
@@ -317,7 +317,7 @@ minetest.register_node("mcl_mobspawners:spawner", {
 		if obj then
 			obj:remove()
 		end
-		mcl_experience.throw_experience(pos, math.random(15, 43))
+		mcl_experience.throw_xp(pos, math.random(15, 43))
 	end,
 
 	on_punch = function(pos)
@@ -387,4 +387,3 @@ minetest.register_lbm({
 		respawn_doll(pos)
 	end,
 })
-

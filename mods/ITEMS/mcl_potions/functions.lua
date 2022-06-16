@@ -116,6 +116,8 @@ minetest.register_globalstep(function(dtime)
 				meta = player:get_meta()
 				meta:set_string("_is_invisible", minetest.serialize(EF.invisible[player]))
 			end
+			potions_set_hud(player)
+
 		end
 
 	end
@@ -165,7 +167,7 @@ minetest.register_globalstep(function(dtime)
 			if is_player then
 				player:set_hp(math.min(player:get_properties().hp_max or 20, player:get_hp() + 1), { type = "set_hp", other = "regeneration" })
 				EF.regenerating[player].heal_timer = 0
-			elseif entity and entity._cmi_is_mob then
+			elseif entity and entity.is_mob then
 				entity.health = math.min(entity.hp_max, entity.health + 1)
 				EF.regenerating[player].heal_timer = 0
 			else -- stop regenerating if not a player or mob
@@ -195,6 +197,7 @@ minetest.register_globalstep(function(dtime)
 			if player:get_pos() then mcl_potions._add_spawner(player, "#2E5299") end
 
 			if player:get_breath() then
+				hb.hide_hudbar(player, "breath")
 				if player:get_breath() < 10 then player:set_breath(10) end
 			end
 
@@ -203,6 +206,7 @@ minetest.register_globalstep(function(dtime)
 				meta:set_string("_is_water_breathing", minetest.serialize(EF.water_breathing[player]))
 				EF.water_breathing[player] = nil
 			end
+			potions_set_hud(player)
 
 		else
 			EF.water_breathing[player] = nil
@@ -225,6 +229,7 @@ minetest.register_globalstep(function(dtime)
 				meta = player:get_meta()
 				meta:set_string("_is_leaping", minetest.serialize(EF.leaping[player]))
 			end
+			potions_set_hud(player)
 
 		else
 			EF.leaping[player] = nil
@@ -247,6 +252,7 @@ minetest.register_globalstep(function(dtime)
 				meta = player:get_meta()
 				meta:set_string("_is_swift", minetest.serialize(EF.swift[player]))
 			end
+			potions_set_hud(player)
 
 		else
 			EF.swift[player] = nil
@@ -270,6 +276,7 @@ minetest.register_globalstep(function(dtime)
 				meta:set_int("night_vision", 0)
 			end
 			mcl_weather.skycolor.update_sky_color({player})
+			potions_set_hud(player)
 
 		else
 			EF.night_vision[player] = nil
@@ -293,6 +300,7 @@ minetest.register_globalstep(function(dtime)
 				meta = player:get_meta()
 				meta:set_string("_is_fire_proof", minetest.serialize(EF.fire_proof[player]))
 			end
+			potions_set_hud(player)
 
 		else
 			EF.fire_proof[player] = nil
@@ -537,7 +545,7 @@ function mcl_potions.is_obj_hit(self, pos)
 
 		if entity and entity.name ~= self.object:get_luaentity().name then
 
-			if entity._cmi_is_mob then
+			if entity.is_mob then
 				return true
 			end
 
@@ -678,7 +686,7 @@ function mcl_potions.healing_func(player, hp)
 			hp = 1
 		end
 
-		if obj and obj._cmi_is_mob then
+		if obj and obj.is_mob then
 			obj.health = math.max(obj.health + hp, obj.hp_max)
 		elseif player:is_player() then
 			player:set_hp(math.min(player:get_hp() + hp, player:get_properties().hp_max), { type = "set_hp", other = "healing" })

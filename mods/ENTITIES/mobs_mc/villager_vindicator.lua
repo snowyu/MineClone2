@@ -3,14 +3,14 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### VINDICATOR
 --###################
 
 
-mobs:register_mob("mobs_mc:vindicator", {
+mcl_mobs:register_mob("mobs_mc:vindicator", {
 	description = S("Vindicator"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -37,14 +37,14 @@ mobs:register_mob("mobs_mc:vindicator", {
 	reach = 2,
 	walk_velocity = 1.2,
 	run_velocity = 2.4,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	drops = {
-		{name = mobs_mc.items.emerald,
+		{name = "mcl_core:emerald",
 		chance = 1,
 		min = 0,
 		max = 1,
 		looting = "common",},
-		{name = mobs_mc.items.iron_axe,
+		{name = "mcl_tools:axe_iron",
 		chance = 100 / 8.5,
 		min = 1,
 		max = 1,
@@ -72,4 +72,4 @@ mobs:register_mob("mobs_mc:vindicator", {
 })
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:vindicator", S("Vindicator"), "mobs_mc_spawn_icon_vindicator.png", 0)
+mcl_mobs:register_egg("mobs_mc:vindicator", S("Vindicator"), "mobs_mc_spawn_icon_vindicator.png", 0)

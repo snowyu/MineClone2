@@ -1,21 +1,10 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 local default_walk_chance = 50
 
 local pr = PseudoRandom(os.time()*10)
-
-local is_food = function(itemstring)
-	for f=1, #mobs_mc.follow.dog do
-		if itemstring == mobs_mc.follow.dog[f] then
-			return true
-		elseif string.sub(itemstring, 1, 6) == "group:" and minetest.get_item_group(itemstring, string.sub(itemstring, 7, -1)) ~= 0 then
-			return true
-		end
-	end
-	return false
-end
 
 -- Wolf
 local wolf = {
@@ -23,31 +12,13 @@ local wolf = {
 	type = "animal",
 	spawn_class = "passive",
 	can_despawn = true,
-	neutral = true,
 	hp_min = 8,
 	hp_max = 8,
 	xp_min = 1,
 	xp_max = 3,
-	rotate = 270,
 	passive = false,
 	group_attack = true,
-
-	--head code
-	has_head = false,
-	head_bone = "head",
-
-	swap_y_with_x = false,
-	reverse_head_yaw = false,
-
-	head_bone_pos_y = 3.6,
-	head_bone_pos_z = -0.6,
-
-	head_height_offset = 1.0525,
-	head_direction_offset = 0.5,
-	head_pitch_modifier = 0,
-	--end head code
-
-	collisionbox = {-0.3, -0.00, -0.3, 0.3, 0.85, 0.3},
+	collisionbox = {-0.3, -0.01, -0.3, 0.3, 0.84, 0.3},
 	visual = "mesh",
 	mesh = "mobs_mc_wolf.b3d",
 	textures = {
@@ -71,15 +42,15 @@ local wolf = {
 	run_velocity = 3,
 	damage = 4,
 	reach = 2,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	fear_height = 4,
-	follow = mobs_mc.follow.wolf,
+	follow = { "mcl_mobitems:bone" },
 	on_rightclick = function(self, clicker)
-		-- Try to tame wolf (intentionally does NOT use mobs:feed_tame)
+		-- Try to tame wolf (intentionally does NOT use mcl_mobs:feed_tame)
 		local tool = clicker:get_wielded_item()
 
 		local dog, ent
-		if tool:get_name() == mobs_mc.items.bone then
+		if tool:get_name() == "mcl_mobitems:bone" then
 
 			minetest.sound_play("mobs_mc_wolf_take_bone", {object=self.object, max_hear_distance=16}, true)
 			if not minetest.is_creative_enabled(clicker:get_player_name()) then
@@ -93,7 +64,6 @@ local wolf = {
 				dog:set_yaw(yaw)
 				ent = dog:get_luaentity()
 				ent.owner = clicker:get_player_name()
-				ent.tamed = true
 				-- cornfirm taming
 				minetest.sound_play("mobs_mc_wolf_bark", {object=dog, max_hear_distance=16}, true)
 				-- Replace wolf
@@ -113,7 +83,7 @@ local wolf = {
 	specific_attack = { "player", "mobs_mc:sheep" },
 }
 
-mobs:register_mob("mobs_mc:wolf", wolf)
+mcl_mobs:register_mob("mobs_mc:wolf", wolf)
 
 -- Tamed wolf
 
@@ -161,37 +131,37 @@ dog.owner_loyal = true
 dog.follow_velocity = 3.2
 -- Automatically teleport dog to owner
 dog.do_custom = mobs_mc.make_owner_teleport_function(12)
+dog.follow = {
+	"mcl_mobitems:rabbit", "mcl_mobitems:cooked_rabbit",
+	"mcl_mobitems:mutton", "mcl_mobitems:cooked_mutton",
+	"mcl_mobitems:beef", "mcl_mobitems:cooked_beef",
+	"mcl_mobitems:chicken", "mcl_mobitems:cooked_chicken",
+	"mcl_mobitems:porkchop", "mcl_mobitems:cooked_porkchop",
+	"mcl_mobitems:rotten_flesh",
+}
 dog.attack_animals = nil
 dog.specific_attack = nil
-dog.breed_distance = 1.5
-dog.baby_size = 0.5
-dog.follow_distance = 2
-dog.follow = "mcl_mobitems:beef"
+
+local is_food = function(itemstring)
+	return table.indexof(dog.follow, itemstring) ~= -1
+end
 
 dog.on_rightclick = function(self, clicker)
 	local item = clicker:get_wielded_item()
 
-	--owner is broken for this
-	--attempt to enter breed state
-	if mobs.enter_breed_state(self,clicker) then
+	if mcl_mobs:protect(self, clicker) then
 		return
-	end
-
-	--make baby grow faster
-	if self.baby then
-		mobs.make_baby_grow_faster(self,clicker)
+	elseif item:get_name() ~= "" and mcl_mobs:capture_mob(self, clicker, 0, 2, 80, false, nil) then
 		return
-	end
-
-	if is_food(item:get_name()) then
+	elseif is_food(item:get_name()) then
 		-- Feed to increase health
 		local hp = self.health
-		local hp_add
+		local hp_add = 0
 		-- Use eatable group to determine health boost
 		local eatable = minetest.get_item_group(item, "eatable")
 		if eatable > 0 then
 			hp_add = eatable
-		elseif item:get_name() == mobs_mc.items.rotten_flesh then
+		elseif item:get_name() == "mcl_mobitems:rotten_flesh" then
 			hp_add = 4
 		else
 			hp_add = 4
@@ -261,37 +231,30 @@ dog.on_rightclick = function(self, clicker)
 	end
 end
 
-mobs:register_mob("mobs_mc:dog", dog)
-
+mcl_mobs:register_mob("mobs_mc:dog", dog)
 -- Spawn
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:wolf",
 "overworld",
 "ground",
 {
-"FlowerForest",
-"Swampland",
-"Taiga",
-"ExtremeHills",
-"BirchForest",
-"MegaSpruceTaiga",
-"MegaTaiga",
-"ExtremeHills+",
-"Forest",
-"Plains",
-"ColdTaiga",
-"SunflowerPlains",
-"RoofedForest",
-"MesaPlateauFM_grasstop",
-"ExtremeHillsM",
-"BirchForestM",
+	"Taiga",
+	"MegaSpruceTaiga",
+	"MegaTaiga",
+	"Forest",
+	"ColdTaiga",
+	"FlowerForest_beach",
+	"Forest_beach",
+	"ColdTaiga_beach_water",
+	"Taiga_beach",
+	"ColdTaiga_beach",
 },
 0,
 minetest.LIGHT_MAX+1,
 30,
 9000,
 7,
-mobs_mc.spawn_height.water+3,
-mobs_mc.spawn_height.overworld_max)
+mobs_mc.water_level+3,
+mcl_vars.mg_overworld_max)
 
-mobs:register_egg("mobs_mc:wolf", S("Wolf"), "mobs_mc_spawn_icon_wolf.png", 0)
+mcl_mobs:register_egg("mobs_mc:wolf", S("Wolf"), "mobs_mc_spawn_icon_wolf.png", 0)

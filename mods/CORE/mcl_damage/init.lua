@@ -14,7 +14,7 @@ mcl_damage = {
 		cactus = {},
 		fall = {bypasses_armor = true},
 		fly_into_wall = {bypasses_armor = true}, -- unused
-		out_of_world = {bypasses_armor = true, bypasses_magic = true, bypasses_invulnerability = true},
+		out_of_world = {bypasses_armor = true, bypasses_magic = true, bypasses_invulnerability = true, bypasses_totem = true},
 		generic = {bypasses_armor = true},
 		magic = {is_magic = true, bypasses_armor = true},
 		dragon_breath = {is_magic = true, bypasses_armor = true},	-- this is only used for dragon fireball; dragon fireball does not actually deal impact damage tho, so this is unreachable
@@ -78,7 +78,7 @@ function mcl_damage.from_punch(mcl_reason, object)
 			mcl_reason.type = "arrow"
 		elseif luaentity._is_fireball then
 			mcl_reason.type = "fireball"
-		elseif luaentity._cmi_is_mob then
+		elseif luaentity.is_mob then
 			mcl_reason.type = "mob"
 		end
 		mcl_reason.source = mcl_reason.source or luaentity._source_object

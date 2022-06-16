@@ -14,39 +14,34 @@ local worlds_mod = minetest.get_modpath("mcl_worlds")
 
 local function get_look_yaw(pos)
 	local n = minetest.get_node(pos)
-	if n.param2 == 1 then
-		return math.pi / 2, n.param2
-	elseif n.param2 == 3 then
-		return -math.pi / 2, n.param2
-	elseif n.param2 == 0 then
-		return math.pi, n.param2
+	local param = n.param2
+	if param == 1 then
+		return math.pi / 2, param
+	elseif param == 3 then
+		return -math.pi / 2, param
+	elseif param == 0 then
+		return math.pi, param
 	else
-		return 0, n.param2
+		return 0, param
 	end
+end
+
+local function players_in_bed_setting()
+	return tonumber(minetest.settings:get("mcl_playersSleepingPercentage")) or 100
 end
 
 local function is_night_skip_enabled()
-	local enable_night_skip = minetest.settings:get_bool("enable_bed_night_skip")
-	if enable_night_skip == nil then
-		enable_night_skip = true
-	end
-	return enable_night_skip
+	return players_in_bed_setting() <= 100
 end
 
 local function check_in_beds(players)
-	local in_bed = mcl_beds.player
 	if not players then
 		players = minetest.get_connected_players()
 	end
-
-	for n, player in pairs(players) do
-		local name = player:get_player_name()
-		if not in_bed[name] then
-			return false
-		end
+	if player_in_bed <= 0 then
+		return false
 	end
-
-	return #players > 0
+	return players_in_bed_setting() <= (player_in_bed * 100) / #players
 end
 
 -- These monsters do not prevent sleep
@@ -81,6 +76,7 @@ local function lay_down(player, pos, bed_pos, state, skip)
 		-- save respawn position when entering bed
 		if spawn_mod and mcl_spawn.set_spawn_pos(player, bed_pos, nil) then
 			minetest.chat_send_player(name, S("New respawn position set!"))
+			awards.unlock(player:get_player_name(), "mcl:sweetDreams")
 		end
 
 		-- No sleeping if too far away
@@ -111,7 +107,7 @@ local function lay_down(player, pos, bed_pos, state, skip)
 				local mobname = ent.name
 				local def = minetest.registered_entities[mobname]
 				-- Approximation of monster detection range
-				if def._cmi_is_mob and ((mobname ~= "mobs_mc:pigman" and def.type == "monster" and not monster_exceptions[mobname]) or (mobname == "mobs_mc:pigman" and ent.state == "attack")) then
+				if def.is_mob and ((mobname ~= "mobs_mc:pigman" and def.type == "monster" and not monster_exceptions[mobname]) or (mobname == "mobs_mc:pigman" and ent.state == "attack")) then
 					if math.abs(bed_pos.y - obj:get_pos().y) <= 5 then
 						return false, S("You can't sleep now, monsters are nearby!")
 					end
@@ -198,7 +194,7 @@ end
 local function update_formspecs(finished, ges)
 	local ges = ges or #minetest.get_connected_players()
 	local form_n = "size[12,5;true]"
-	local all_in_bed = ges == player_in_bed
+	local all_in_bed = players_in_bed_setting() <= (player_in_bed * 100) / ges
 	local night_skip = is_night_skip_enabled()
 	local button_leave = "button_exit[4,3;4,0.75;leave;"..F(S("Leave bed")).."]"
 	local button_abort = "button_exit[4,3;4,0.75;leave;"..F(S("Abort sleep")).."]"
@@ -221,7 +217,13 @@ local function update_formspecs(finished, ges)
 			form_n = form_n .. bg_sleep
 			form_n = form_n .. button_abort
 		else
-			text = text .. "\n" .. S("You will fall asleep when all players are in bed.")
+			local comment = "You will fall asleep when "
+			if players_in_bed_setting() == 100 then
+				comment = S(comment .. "all players are in bed.")
+			else
+				comment = S(comment .. "@1% of all players are in bed.", players_in_bed_setting())
+			end
+			text = text .. "\n" .. comment
 			form_n = form_n .. bg_presleep
 			form_n = form_n .. button_leave
 		end
@@ -348,7 +350,6 @@ function mcl_beds.on_rightclick(pos, player, is_top)
 		end)
 	end
 end
-
 
 -- Callbacks
 minetest.register_on_joinplayer(function(player)

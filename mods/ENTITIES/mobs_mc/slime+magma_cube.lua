@@ -1,6 +1,6 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 -- Returns a function that spawns children in a circle around pos.
 -- To be used as on_die callback.
@@ -16,7 +16,8 @@ local spawn_children_on_die = function(child_mob, children_count, spawn_distance
 		if not eject_speed then
 			eject_speed = 1
 		end
-		local mother_stuck = minetest.registered_nodes[minetest.get_node(pos).name].walkable
+		local mndef = minetest.registered_nodes[minetest.get_node(pos).name]
+		local mother_stuck = mndef and mndef.walkable
 		angle = math.random(0, math.pi*2)
 		local children = {}
 		for i=1,children_count do
@@ -26,7 +27,8 @@ local spawn_children_on_die = function(child_mob, children_count, spawn_distance
 			-- If child would end up in a wall, use position of the "mother", unless
 			-- the "mother" was stuck as well
 			local speed_penalty = 1
-			if (not mother_stuck) and minetest.registered_nodes[minetest.get_node(newpos).name].walkable then
+			local cndef = minetest.registered_nodes[minetest.get_node(newpos).name]
+			if (not mother_stuck) and cndef and cndef.walkable then
 				newpos = pos
 				speed_penalty = 0.5
 			end
@@ -41,10 +43,10 @@ local spawn_children_on_die = function(child_mob, children_count, spawn_distance
 		-- If mother was murdered, children attack the killer after 1 second
 		if self.state == "attack" then
 			minetest.after(1.0, function(children, enemy)
-				for c = 1, #children do
+				for c=1, #children do
 					local child = children[c]
 					local le = child:get_luaentity()
-					if le then
+					if le ~= nil then
 						le.state = "attack"
 						le.attack = enemy
 					end
@@ -64,7 +66,6 @@ local slime_big = {
 	hp_max = 16,
 	xp_min = 4,
 	xp_max = 4,
-	rotate = 270,
 	collisionbox = {-1.02, -0.01, -1.02, 1.02, 2.03, 1.02},
 	visual_size = {x=12.5, y=12.5},
 	textures = {{"mobs_mc_slime.png", "mobs_mc_slime.png"}},
@@ -96,9 +97,8 @@ local slime_big = {
 	},
 	fall_damage = 0,
 	view_range = 16,
-	attack_type = "jump_punch",
+	attack_type = "dogfight",
 	passive = false,
-	jump_only = true,
 	jump = true,
 	walk_velocity = 2.5,
 	run_velocity = 2.5,
@@ -109,7 +109,7 @@ local slime_big = {
 	on_die = spawn_children_on_die("mobs_mc:slime_small", 4, 1.0, 1.5),
 	use_texture_alpha = true,
 }
-mobs:register_mob("mobs_mc:slime_big", slime_big)
+mcl_mobs:register_mob("mobs_mc:slime_big", slime_big)
 
 local slime_small = table.copy(slime_big)
 slime_small.sounds.base_pitch = 1.15
@@ -126,7 +126,7 @@ slime_small.run_velocity = 1.3
 slime_small.jump_height = 4.3
 slime_small.spawn_small_alternative = "mobs_mc:slime_tiny"
 slime_small.on_die = spawn_children_on_die("mobs_mc:slime_tiny", 4, 0.6, 1.0)
-mobs:register_mob("mobs_mc:slime_small", slime_small)
+mcl_mobs:register_mob("mobs_mc:slime_small", slime_small)
 
 local slime_tiny = table.copy(slime_big)
 slime_tiny.sounds.base_pitch = 1.3
@@ -140,7 +140,7 @@ slime_tiny.damage = 0
 slime_tiny.reach = 2.5
 slime_tiny.drops = {
 	-- slimeball
-	{name = mobs_mc.items.slimeball,
+	{name = "mcl_mobitems:slimeball",
 	chance = 1,
 	min = 0,
 	max = 2,},
@@ -151,12 +151,12 @@ slime_tiny.jump_height = 3
 slime_tiny.spawn_small_alternative = nil
 slime_tiny.on_die = nil
 
-mobs:register_mob("mobs_mc:slime_tiny", slime_tiny)
+mcl_mobs:register_mob("mobs_mc:slime_tiny", slime_tiny)
 
-local smin = mobs_mc.spawn_height.overworld_min
-local smax = mobs_mc.spawn_height.water - 23
+local smin = mcl_vars.mg_overworld_min
+local smax = mobs_mc.water_level - 23
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:slime_tiny",
 "overworld",
 "ground",
@@ -200,7 +200,7 @@ minetest.LIGHT_MAX+1,
 smin,
 smax)
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:slime_small",
 "overworld",
 "ground",
@@ -244,7 +244,7 @@ minetest.LIGHT_MAX+1,
 smin,
 smax)
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:slime_big",
 "overworld",
 "ground",
@@ -311,12 +311,11 @@ local magma_cube_big = {
 	},
 	walk_velocity = 4,
 	run_velocity = 4,
-	rotate = 270,
 	damage = 6,
 	reach = 3,
 	armor = 53,
 	drops = {
-		{name = mobs_mc.items.magma_cream,
+		{name = "mcl_mobitems:magma_cream",
 		chance = 4,
 		min = 1,
 		max = 1,},
@@ -335,13 +334,12 @@ local magma_cube_big = {
 	},
 	water_damage = 0,
 	lava_damage = 0,
-    fire_damage = 0,
+        fire_damage = 0,
 	light_damage = 0,
 	fall_damage = 0,
 	view_range = 16,
-	attack_type = "jump_punch",
+	attack_type = "dogfight",
 	passive = false,
-	jump_only = true,
 	jump = true,
 	jump_height = 8,
 	walk_chance = 0,
@@ -350,7 +348,7 @@ local magma_cube_big = {
 	on_die = spawn_children_on_die("mobs_mc:magma_cube_small", 3, 0.8, 1.5),
 	fire_resistant = true,
 }
-mobs:register_mob("mobs_mc:magma_cube_big", magma_cube_big)
+mcl_mobs:register_mob("mobs_mc:magma_cube_big", magma_cube_big)
 
 local magma_cube_small = table.copy(magma_cube_big)
 magma_cube_small.sounds.jump = "mobs_mc_magma_cube_small"
@@ -371,7 +369,7 @@ magma_cube_small.reach = 2.75
 magma_cube_small.armor = 66
 magma_cube_small.spawn_small_alternative = "mobs_mc:magma_cube_tiny"
 magma_cube_small.on_die = spawn_children_on_die("mobs_mc:magma_cube_tiny", 4, 0.6, 1.0)
-mobs:register_mob("mobs_mc:magma_cube_small", magma_cube_small)
+mcl_mobs:register_mob("mobs_mc:magma_cube_small", magma_cube_small)
 
 local magma_cube_tiny = table.copy(magma_cube_big)
 magma_cube_tiny.sounds.jump = "mobs_mc_magma_cube_small"
@@ -393,13 +391,13 @@ magma_cube_tiny.drops = {}
 magma_cube_tiny.spawn_small_alternative = nil
 magma_cube_tiny.on_die = nil
 
-mobs:register_mob("mobs_mc:magma_cube_tiny", magma_cube_tiny)
+mcl_mobs:register_mob("mobs_mc:magma_cube_tiny", magma_cube_tiny)
 
 
-local mmin = mobs_mc.spawn_height.nether_min
-local mmax = mobs_mc.spawn_height.nether_max
+local mmin = mcl_vars.mg_nether_min
+local mmax = mcl_vars.mg_nether_max
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:magma_cube_tiny",
 "nether",
 "ground",
@@ -415,7 +413,7 @@ mmin,
 mmax)
 
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:magma_cube_small",
 "nether",
 "ground",
@@ -430,7 +428,7 @@ minetest.LIGHT_MAX+1,
 mmin,
 mmax)
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:magma_cube_big",
 "nether",
 "ground",
@@ -445,11 +443,11 @@ minetest.LIGHT_MAX+1,
 mmin,
 mmax)
 
---mobs:spawn_specific("mobs_mc:magma_cube_tiny", mobs_mc.spawn.nether_fortress, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11000, 4, mmin, mmax)
---mobs:spawn_specific("mobs_mc:magma_cube_small", mobs_mc.spawn.nether_fortress, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11100, 4, mmin, mmax)
---mobs:spawn_specific("mobs_mc:magma_cube_big", mobs_mc.spawn.nether_fortress, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11200, 4, mmin, mmax)
+--mcl_mobs:spawn_specific("mobs_mc:magma_cube_tiny", { "mcl_nether:nether_brick", "mcl_nether:netherrack" }, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11000, 4, mmin, mmax)
+--mcl_mobs:spawn_specific("mobs_mc:magma_cube_small", { "mcl_nether:nether_brick", "mcl_nether:netherrack" }, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11100, 4, mmin, mmax)
+--mcl_mobs:spawn_specific("mobs_mc:magma_cube_big", { "mcl_nether:nether_brick", "mcl_nether:netherrack" }, {"air"}, 0, minetest.LIGHT_MAX+1, 30, 11200, 4, mmin, mmax)
 
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:magma_cube_big", S("Magma Cube"), "mobs_mc_spawn_icon_magmacube.png")
-mobs:register_egg("mobs_mc:slime_big", S("Slime"), "mobs_mc_spawn_icon_slime.png")
+mcl_mobs:register_egg("mobs_mc:magma_cube_big", S("Magma Cube"), "mobs_mc_spawn_icon_magmacube.png")
+mcl_mobs:register_egg("mobs_mc:slime_big", S("Slime"), "mobs_mc_spawn_icon_slime.png")

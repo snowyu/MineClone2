@@ -1,5 +1,7 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 
+local mod_target = minetest.get_modpath("mcl_target")
+
 local math = math
 
 -- Time in seconds after which a stuck arrow is deleted
@@ -208,35 +210,40 @@ function mcl_potions.register_arrow(name, desc, color, def)
 			end
 
 			-- Iterate through all objects and remember the closest attackable object
-			for k, obj in pairs(objs) do
-				local ok = false
-				-- Arrows can only damage players and mobs
-				if obj ~= self._shooter and obj:is_player() then
-					ok = true
-				elseif obj:get_luaentity() then
-					if obj ~= self._shooter and obj:get_luaentity()._cmi_is_mob then
+			local arrow_dir = self.object:get_velocity()
+			--create a raycast from the arrow based on the velocity of the arrow to deal with lag
+			local raycast = minetest.raycast(pos, vector.add(pos, vector.multiply(arrow_dir, 0.1)), true, false)
+			for hitpoint in raycast do
+				if hitpoint.type == "object" then
+					-- find the closest object that is in the way of the arrow
+					local ok = false
+					if hitpoint.ref:is_player() then
 						ok = true
+					elseif hitpoint.ref:get_luaentity() then
+						if (hitpoint.ref:get_luaentity().is_mob or hitpoint.ref:get_luaentity()._hittable_by_projectile) then
+							ok = true
+						end
 					end
-				end
-
-				if ok then
-					local dist = vector.distance(pos, obj:get_pos())
-					if not closest_object or not closest_distance then
-						closest_object = obj
-						closest_distance = dist
-					elseif dist < closest_distance then
-						closest_object = obj
-						closest_distance = dist
+					if ok then
+						local dist = vector.distance(hitpoint.ref:get_pos(), pos)
+						if not closest_object or not closest_distance then
+							closest_object = hitpoint.ref
+							closest_distance = dist
+						elseif dist < closest_distance then
+							closest_object = hitpoint.ref
+							closest_distance = dist
+						end
 					end
 				end
 			end
+
 
 			-- If an attackable object was found, we will damage the closest one only
 			if closest_object then
 				local obj = closest_object
 				local is_player = obj:is_player()
 				local lua = obj:get_luaentity()
-				if obj ~= self._shooter and (is_player or (lua and lua._cmi_is_mob)) then
+				if obj ~= self._shooter and (is_player or (lua and lua.is_mob)) then
 
 					if obj:get_hp() > 0 then
 						-- Check if there is no solid node between arrow and object
@@ -341,6 +348,11 @@ function mcl_potions.register_arrow(name, desc, color, def)
 
 					self.object:set_velocity({x=0, y=0, z=0})
 					self.object:set_acceleration({x=0, y=0, z=0})
+
+					-- Activate target
+					if mod_target and snode.name == "mcl_target:target_off" then
+						mcl_target.hit(self._stuckin, 1) --10 redstone ticks
+					end
 
 					-- Push the button! Push, push, push the button!
 					if mod_button and minetest.get_item_group(node.name, "button") > 0 and minetest.get_item_group(node.name, "button_push_by_arrow") == 1 then

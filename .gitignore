@@ -1,4 +1,5 @@
 # Text Editor TMP Files
 *.swp
-# translation backup files
-*.old
+*.blend1
+*.blend2
+*.blend3

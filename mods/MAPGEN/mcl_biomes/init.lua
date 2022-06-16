@@ -1496,7 +1496,7 @@ local function register_dimension_biomes()
 		heat_point = 100,
 		humidity_point = 0,
 		_mcl_biome_type = "hot",
-		_mcl_palette_index = 19,
+		_mcl_palette_index = 17,
 	})
 
 	--[[ THE END ]]
@@ -3538,7 +3538,7 @@ local function register_decorations()
 	-- Pumpkin
 	minetest.register_decoration({
 		deco_type = "simple",
-		decoration = "mcl_farming:pumpkin_face",
+		decoration = "mcl_farming:pumpkin",
 		param2 = 0,
 		param2_max = 3,
 		place_on = {"group:grass_block_no_snow"},

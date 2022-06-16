@@ -2,9 +2,9 @@
 --################### SILVERFISH
 --###################
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
-mobs:register_mob("mobs_mc:silverfish", {
+mcl_mobs:register_mob("mobs_mc:silverfish", {
 	description = S("Silverfish"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -35,7 +35,14 @@ mobs:register_mob("mobs_mc:silverfish", {
 	run_velocity = 2,
 	jump = true,
 	fear_height = 4,
-	replace_what = mobs_mc.replace.silverfish,
+	replace_what = {
+		{"mcl_core:stone", "mcl_monster_eggs:monster_egg_stone", -1},
+		{"mcl_core:cobble", "mcl_monster_eggs:monster_egg_cobble", -1},
+		{"mcl_core:stonebrick", "mcl_monster_eggs:monster_egg_stonebrick", -1},
+		{"mcl_core:stonebrickmossy", "mcl_monster_eggs:monster_egg_stonebrickmossy", -1},
+		{"mcl_core:stonebrickcracked", "mcl_monster_eggs:monster_egg_stonebrickcracked", -1},
+		{"mcl_core:stonebrickcarved", "mcl_monster_eggs:monster_egg_stonebrickcarved", -1},
+	},
 	replace_rate = 2,
 	animation = {
 		speed_normal = 25,		speed_run = 50,
@@ -44,11 +51,12 @@ mobs:register_mob("mobs_mc:silverfish", {
 		run_start = 0,		run_end = 20,
 	},
 	view_range = 16,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	damage = 1,
+	reach = 1,
 })
 
-mobs:register_egg("mobs_mc:silverfish", S("Silverfish"), "mobs_mc_spawn_icon_silverfish.png", 0)
+mcl_mobs:register_egg("mobs_mc:silverfish", S("Silverfish"), "mobs_mc_spawn_icon_silverfish.png", 0)
 
 -- Monster egg blocks (Minetest Game)
 if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
@@ -61,7 +69,7 @@ if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
 		description = "Stone Monster Egg",
 		tiles = {"default_stone.png"},
 		groups = {oddly_breakable_by_hand = 2, spawns_silverfish = 1},
-		drop = "",
+		drop = '',
 		is_ground_content = true,
 		sounds = default.node_sound_stone_defaults(),
 		after_dig_node = spawn_silverfish,
@@ -72,7 +80,7 @@ if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
 		tiles = {"default_cobble.png"},
 		is_ground_content = false,
 		groups = {oddly_breakable_by_hand = 2, spawns_silverfish = 1},
-		drop = "",
+		drop = '',
 		sounds = default.node_sound_stone_defaults(),
 		after_dig_node = spawn_silverfish,
 	})
@@ -82,7 +90,7 @@ if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
 		tiles = {"default_mossycobble.png"},
 		is_ground_content = false,
 		groups = {oddly_breakable_by_hand = 2, spawns_silverfish = 1},
-		drop = "",
+		drop = '',
 		sounds = default.node_sound_stone_defaults(),
 		after_dig_node = spawn_silverfish,
 	})
@@ -94,7 +102,7 @@ if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
 		tiles = {"default_stone_brick.png"},
 		is_ground_content = false,
 		groups = {oddly_breakable_by_hand = 2, spawns_silverfish = 1},
-		drop = "",
+		drop = '',
 		sounds = default.node_sound_stone_defaults(),
 		after_dig_node = spawn_silverfish,
 	})
@@ -104,7 +112,7 @@ if minetest.get_modpath("default") and mobs_mc.create_monster_egg_nodes then
 		tiles = {"default_stone_block.png"},
 		is_ground_content = false,
 		groups = {oddly_breakable_by_hand = 2, spawns_silverfish = 1},
-		drop = "",
+		drop = '',
 		sounds = default.node_sound_stone_defaults(),
 		after_dig_node = spawn_silverfish,
 	})

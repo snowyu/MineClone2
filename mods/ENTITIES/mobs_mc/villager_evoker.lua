@@ -3,7 +3,7 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### EVOKER
@@ -11,7 +11,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 local pr = PseudoRandom(os.time()*666)
 
-mobs:register_mob("mobs_mc:evoker", {
+mcl_mobs:register_mob("mobs_mc:evoker", {
 	description = S("Evoker"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -35,7 +35,7 @@ mobs:register_mob("mobs_mc:evoker", {
 	walk_velocity = 0.2,
 	run_velocity = 1.4,
 	group_attack = true,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	-- Summon vexes
 	custom_attack = function(self, to_attack)
 		local r = pr:next(2,4)
@@ -53,12 +53,12 @@ mobs:register_mob("mobs_mc:evoker", {
 	shoot_interval = 15,
 	passive = false,
 	drops = {
-		{name = mobs_mc.items.emerald,
+		{name = "mcl_core:emerald",
 		chance = 1,
 		min = 0,
 		max = 1,
 		looting = "common",},
-		{name = mobs_mc.items.totem,
+		{name = "mcl_totems:totem",
 		chance = 1,
 		min = 1,
 		max = 1,},
@@ -84,4 +84,4 @@ mobs:register_mob("mobs_mc:evoker", {
 })
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:evoker", S("Evoker"), "mobs_mc_spawn_icon_evoker.png", 0)
+mcl_mobs:register_egg("mobs_mc:evoker", S("Evoker"), "mobs_mc_spawn_icon_evoker.png", 0)

@@ -1,13 +1,13 @@
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 --###################
 --################### POLARBEAR
 --###################
 
 
-mobs:register_mob("mobs_mc:polar_bear", {
+mcl_mobs:register_mob("mobs_mc:polar_bear", {
 	description = S("Polar Bear"),
 	type = "animal",
 	spawn_class = "passive",
@@ -31,16 +31,16 @@ mobs:register_mob("mobs_mc:polar_bear", {
 	walk_velocity = 1.2,
 	run_velocity = 2.4,
 	group_attack = true,
-	attack_type = "punch",
+	attack_type = "dogfight",
 	drops = {
 		-- 3/4 chance to drop raw fish (poor approximation)
-		{name = mobs_mc.items.fish_raw,
+		{name = "mcl_fishing:fish_raw",
 		chance = 2,
 		min = 0,
 		max = 2,
 		looting = "common",},
 		-- 1/4 to drop raw salmon
-		{name = mobs_mc.items.salmon_raw,
+		{name = "mcl_fishing:salmon_raw",
 		chance = 4,
 		min = 0,
 		max = 2,
@@ -68,7 +68,7 @@ mobs:register_mob("mobs_mc:polar_bear", {
 })
 
 
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:polar_bear",
 "overworld",
 "ground",
@@ -83,8 +83,8 @@ minetest.LIGHT_MAX+1,
 30,
 7000,
 3,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 -- spawn egg
-mobs:register_egg("mobs_mc:polar_bear", S("Polar Bear"), "mobs_mc_spawn_icon_polarbear.png", 0)
+mcl_mobs:register_egg("mobs_mc:polar_bear", S("Polar Bear"), "mobs_mc_spawn_icon_polarbear.png", 0)

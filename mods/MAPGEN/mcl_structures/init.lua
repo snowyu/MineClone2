@@ -179,7 +179,7 @@ function mcl_structures.generate_igloo(pos, rotation, pr)
 			real_depth = real_depth + 1
 			local node = minetest.get_node({x=tpos.x,y=tpos.y-y,z=tpos.z})
 			local def = minetest.registered_nodes[node.name]
-			if (not def) or (not def.walkable) or (def.liquidtype ~= "none") or (not def.is_ground_content) then
+			if not (def and def.walkable and def.liquidtype == "none" and def.is_ground_content) then
 				bpos.y = tpos.y-y+1
 				break
 			end
@@ -280,6 +280,22 @@ function mcl_structures.generate_boulder(pos, rotation, pr)
 	return minetest.place_schematic(newpos, path, rotation) -- don't serialize schematics for registered biome decorations, for MT 5.4.0, https://github.com/minetest/minetest/issues/10995
 end
 
+local function spawn_witch(p1,p2)
+	local c = minetest.find_node_near(p1,15,{"mcl_cauldrons:cauldron"})
+	if c then
+		local nn = minetest.find_nodes_in_area_under_air(vector.new(p1.x,c.y-1,p1.z),vector.new(p2.x,c.y-1,p2.z),{"mcl_core:sprucewood"})
+		local witch = minetest.add_entity(vector.offset(nn[math.random(#nn)],0,1,0),"mobs_mc:witch"):get_luaentity()
+		local cat = minetest.add_entity(vector.offset(nn[math.random(#nn)],0,1,0),"mobs_mc:cat"):get_luaentity()
+		witch._home = c
+		witch.can_despawn = false
+		cat.object:set_properties({textures = {"mobs_mc_cat_black.png"}})
+		cat.owner = "!witch!" --so it's not claimable by player
+		cat._home = c
+		cat.can_despawn = false
+		return
+	end
+end
+
 local function hut_placement_callback(p1, p2, size, orientation, pr)
 	if not p1 or not p2 then return end
 	local legs = minetest.find_nodes_in_area(p1, p2, "mcl_core:tree")
@@ -289,6 +305,7 @@ local function hut_placement_callback(p1, p2, size, orientation, pr)
 			minetest.swap_node(legs[i], {name = "mcl_core:tree", param2 = 2})
 		end
 	end
+	spawn_witch(p1,p2)
 end
 
 function mcl_structures.generate_witch_hut(pos, rotation, pr)
@@ -454,16 +471,18 @@ local function temple_placement_callback(p1, p2, size, rotation, pr)
 				{ itemstring = "mcl_mobitems:bone", weight = 25, amount_min = 4, amount_max=6 },
 				{ itemstring = "mcl_mobitems:rotten_flesh", weight = 25, amount_min = 3, amount_max=7 },
 				{ itemstring = "mcl_mobitems:spider_eye", weight = 25, amount_min = 1, amount_max=3 },
-				{ itemstack = mcl_enchanting.get_uniform_randomly_enchanted_book({"soul_speed"}, pr), weight = 20, },
+				{ itemstring = "mcl_books:book", weight = 20, func = function(stack, pr)
+					mcl_enchanting.enchant_uniform_randomly(stack, {"soul_speed"}, pr)
+				end },
 				{ itemstring = "mcl_mobitems:saddle", weight = 20, },
 				{ itemstring = "mcl_core:apple_gold", weight = 20, },
 				{ itemstring = "mcl_core:gold_ingot", weight = 15, amount_min = 2, amount_max = 7 },
 				{ itemstring = "mcl_core:iron_ingot", weight = 15, amount_min = 1, amount_max = 5 },
 				{ itemstring = "mcl_core:emerald", weight = 15, amount_min = 1, amount_max = 3 },
 				{ itemstring = "", weight = 15, },
-				{ itemstring = "mobs_mc:iron_horse_armor", weight = 15, },
-				{ itemstring = "mobs_mc:gold_horse_armor", weight = 10, },
-				{ itemstring = "mobs_mc:diamond_horse_armor", weight = 5, },
+				{ itemstring = "mcl_mobitems:iron_horse_armor", weight = 15, },
+				{ itemstring = "mcl_mobitems:gold_horse_armor", weight = 10, },
+				{ itemstring = "mcl_mobitems:diamond_horse_armor", weight = 5, },
 				{ itemstring = "mcl_core:diamond", weight = 5, amount_min = 1, amount_max = 3 },
 				{ itemstring = "mcl_core:apple_gold_enchanted", weight = 2, },
 			}
@@ -511,7 +530,7 @@ function mcl_structures.generate_desert_temple(pos, rotation, pr)
 	mcl_structures.place_schematic(newpos, path, rotation or "random", nil, true, nil, temple_placement_callback, pr)
 end
 
-local registered_structures = {}
+local structure_data = {}
 
 --[[ Returns a table of structure of the specified type.
 Currently the only valid parameter is "stronghold".
@@ -524,18 +543,18 @@ Format of return value:
 
 TODO: Implement this function for all other structure types as well.
 ]]
-function mcl_structures.get_registered_structures(structure_type)
-	if registered_structures[structure_type] then
-		return table.copy(registered_structures[structure_type])
+function mcl_structures.get_structure_data(structure_type)
+	if structure_data[structure_type] then
+		return table.copy(structure_data[structure_type])
 	else
 		return {}
 	end
 end
 
 -- Register a structures table for the given type. The table format is the same as for
--- mcl_structures.get_registered_structures.
-function mcl_structures.register_structures(structure_type, structures)
-	registered_structures[structure_type] = structures
+-- mcl_structures.get_structure_data.
+function mcl_structures.register_structure_data(structure_type, structures)
+	structure_data[structure_type] = structures
 end
 
 local function dir_to_rotation(dir)
@@ -551,6 +570,8 @@ local function dir_to_rotation(dir)
 	end
 	return "0"
 end
+
+dofile(modpath.."/api.lua")
 
 -- Debug command
 minetest.register_chatcommand("spawnstruct", {
@@ -600,6 +621,12 @@ minetest.register_chatcommand("spawnstruct", {
 			message = S("Error: No structure type given. Please use “/spawnstruct <type>”.")
 			errord = true
 		else
+			for n,d in pairs(mcl_structures.registered_structures) do
+				if n == param then
+					mcl_structures.place_structure(pos,d,pr)
+					return true,message
+				end
+			end
 			message = S("Error: Unknown structure type. Please use “/spawnstruct <type>”.")
 			errord = true
 		end
@@ -609,3 +636,10 @@ minetest.register_chatcommand("spawnstruct", {
 		end
 	end
 })
+minetest.register_on_mods_loaded(function()
+	local p = ""
+	for n,_ in pairs(mcl_structures.registered_structures) do
+		p = p .. " | "..n
+	end
+	minetest.registered_chatcommands["spawnstruct"].params = minetest.registered_chatcommands["spawnstruct"].params .. p
+end)

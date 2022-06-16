@@ -3,12 +3,12 @@
 --made for MC like Survival game
 --License for code WTFPL and otherwise stated in readmes
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
 local snow_trail_frequency = 0.5 -- Time in seconds for checking to add a new snow trail
 
 local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
-local mod_throwing = minetest.get_modpath("mcl_throwing")
+local mod_throwing = minetest.get_modpath("mcl_throwing") ~= nil
 
 local gotten_texture = {
 	"mobs_mc_snowman.png",
@@ -20,7 +20,7 @@ local gotten_texture = {
 	"blank.png",
 }
 
-mobs:register_mob("mobs_mc:snowman", {
+mcl_mobs:register_mob("mobs_mc:snowman", {
 	description = S("Snow Golem"),
 	type = "npc",
 	spawn_class = "passive",
@@ -52,7 +52,7 @@ mobs:register_mob("mobs_mc:snowman", {
                 "farming_pumpkin_top.png", --left
 	},
 	gotten_texture = gotten_texture,
-	drops = {{ name = mobs_mc.items.snowball, chance = 1, min = 0, max = 15 }},
+	drops = {{ name = "mcl_throwing:snowball", chance = 1, min = 0, max = 15 }},
 	visual_size = {x=3, y=3},
 	walk_velocity = 0.6,
 	run_velocity = 2,
@@ -106,7 +106,7 @@ mobs:register_mob("mobs_mc:snowman", {
 				local belowdef = minetest.registered_nodes[minetest.get_node(below).name]
 				if belowdef and belowdef.walkable and (belowdef.node_box == nil or belowdef.node_box.type == "regular") then
 					-- Place top snow
-					minetest.set_node(pos, {name = mobs_mc.items.top_snow})
+					minetest.set_node(pos, {name = "mcl_core:snow"})
 				end
 			end
 		end
@@ -114,7 +114,7 @@ mobs:register_mob("mobs_mc:snowman", {
 	-- Remove pumpkin if using shears
 	on_rightclick = function(self, clicker)
 		local item = clicker:get_wielded_item()
-		if self.gotten ~= true and item:get_name() == mobs_mc.items.shears then
+		if self.gotten ~= true and item:get_name() == "mcl_tools:shears" then
 			-- Remove pumpkin
 			self.gotten = true
 			self.object:set_properties({
@@ -124,9 +124,13 @@ mobs:register_mob("mobs_mc:snowman", {
 			local pos = self.object:get_pos()
 			minetest.sound_play("mcl_tools_shears_cut", {pos = pos}, true)
 
+			if minetest.registered_items["mcl_farming:pumpkin_face"] then
+				minetest.add_item({x=pos.x, y=pos.y+1.4, z=pos.z}, "mcl_farming:pumpkin_face")
+			end
+
 			-- Wear out
 			if not minetest.is_creative_enabled(clicker:get_player_name()) then
-				item:add_wear(mobs_mc.misc.shears_wear)
+				item:add_wear(mobs_mc.shears_wear)
 				clicker:get_inventory():set_stack("main", clicker:get_wield_index(), item)
 			end
 		end
@@ -156,7 +160,7 @@ end
 -- This is to be called when a pumpkin or jack'o lantern has been placed. Recommended: In the on_construct function
 -- of the node.
 -- This summons a snow golen when pos is next to a row of two snow blocks.
-mobs_mc.tools.check_snow_golem_summon = function(pos)
+function mobs_mc.check_snow_golem_summon(pos)
 	local checks = {
 		-- These are the possible placement patterns
 		-- { snow block pos. 1, snow block pos. 2, snow golem spawn position }
@@ -174,14 +178,14 @@ mobs_mc.tools.check_snow_golem_summon = function(pos)
 		local place = checks[c][3]
 		local b1n = minetest.get_node(b1)
 		local b2n = minetest.get_node(b2)
-		if b1n.name == mobs_mc.items.snow_block and b2n.name == mobs_mc.items.snow_block then
+		if b1n.name == "mcl_core:snowblock" and b2n.name == "mcl_core:snowblock" then
 			-- Remove the pumpkin and both snow blocks and summon the snow golem
 			minetest.remove_node(pos)
 			minetest.remove_node(b1)
 			minetest.remove_node(b2)
-			minetest.check_for_falling(pos)
-			minetest.check_for_falling(b1)
-			minetest.check_for_falling(b2)
+			core.check_for_falling(pos)
+			core.check_for_falling(b1)
+			core.check_for_falling(b2)
 			local obj = minetest.add_entity(place, "mobs_mc:snowman")
 			if obj then
 				summon_particles(obj)
@@ -192,4 +196,4 @@ mobs_mc.tools.check_snow_golem_summon = function(pos)
 end
 
 -- Spawn egg
-mobs:register_egg("mobs_mc:snowman", S("Snow Golem"), "mobs_mc_spawn_icon_snowman.png", 0)
+mcl_mobs:register_egg("mobs_mc:snowman", S("Snow Golem"), "mobs_mc_spawn_icon_snowman.png", 0)

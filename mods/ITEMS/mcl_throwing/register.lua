@@ -3,6 +3,8 @@ local S = minetest.get_translator(minetest.get_current_modname())
 local math = math
 local vector = vector
 
+local mod_target = minetest.get_modpath("mcl_target")
+
 -- The snowball entity
 local snowball_ENTITY={
 	physical = false,
@@ -59,11 +61,9 @@ local function check_object_hit(self, pos, dmg)
 		and entity.name ~= self.object:get_luaentity().name then
 
 			if object:is_player() and self._thrower ~= object:get_player_name() then
-				-- TODO: Deal knockback
 				self.object:remove()
 				return true
-			elseif (entity._cmi_is_mob == true or entity._hittable_by_projectile) and (self._thrower ~= object) then
-				-- FIXME: Knockback is broken
+			elseif (entity.is_mob == true or entity._hittable_by_projectile) and (self._thrower ~= object) then
 				object:punch(self.object, 1.0, {
 					full_punch_interval = 1.0,
 					damage_groups = dmg,
@@ -111,6 +111,9 @@ local function snowball_on_step(self, dtime)
 			minetest.sound_play("mcl_throwing_snowball_impact_hard", { pos = pos, max_hear_distance=16, gain=0.7 }, true)
 			snowball_particles(self._lastpos, vel)
 			self.object:remove()
+			if mod_target and node.name == "mcl_target:target_off" then
+				mcl_target.hit(vector.round(pos), 0.4) --4 redstone ticks
+			end
 			return
 		end
 	end
@@ -172,12 +175,15 @@ local function egg_on_step(self, dtime)
 			end
 			minetest.sound_play("mcl_throwing_egg_impact", { pos = self.object:get_pos(), max_hear_distance=10, gain=0.5 }, true)
 			self.object:remove()
+			if mod_target and node.name == "mcl_target:target_off" then
+				mcl_target.hit(vector.round(pos), 0.4) --4 redstone ticks
+			end
 			return
 		end
 	end
 
 	-- Destroy when hitting a mob or player (no chick spawning)
-	if check_object_hit(self, pos) then
+	if check_object_hit(self, pos, 0) then
 		minetest.sound_play("mcl_throwing_egg_impact", { pos = self.object:get_pos(), max_hear_distance=10, gain=0.5 }, true)
 		self.object:remove()
 		return
@@ -276,6 +282,9 @@ local function pearl_on_step(self, dtime)
 
 			end
 			self.object:remove()
+			if mod_target and node.name == "mcl_target:target_off" then
+				mcl_target.hit(vector.round(pos), 0.4) --4 redstone ticks
+			end
 			return
 		end
 	end

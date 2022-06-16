@@ -1,6 +1,8 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 local GRAVITY = tonumber(minetest.settings:get("movement_gravity"))
 
+local mod_target = minetest.get_modpath("mcl_target")
+
 local function splash_image(colorstring, opacity)
 	if not opacity then
 		opacity = 127
@@ -66,6 +68,9 @@ function mcl_potions.register_splash(name, descr, color, def)
 			local g = minetest.get_item_group(n, "liquid")
 			local d = 0.1
 			local redux_map = {7/8,0.5,0.25}
+			if mod_target and n == "mcl_target:target_off" then
+				mcl_target.hit(vector.round(pos), 0.4) --4 redstone ticks
+			end
 			if n ~= "air" and n ~= "mcl_portals:portal" and n ~= "mcl_portals:portal_end" and g == 0 or mcl_potions.is_obj_hit(self, pos) then
 				minetest.sound_play("mcl_potions_breaking_glass", {pos = pos, max_hear_distance = 16, gain = 1})
 				local texture, acc
@@ -105,7 +110,7 @@ function mcl_potions.register_splash(name, descr, color, def)
 				for _,obj in pairs(minetest.get_objects_inside_radius(pos, 4)) do
 
 					local entity = obj:get_luaentity()
-					if obj:is_player() or entity._cmi_is_mob then
+					if obj:is_player() or entity.is_mob then
 
 						local pos2 = obj:get_pos()
 						local rad = math.floor(math.sqrt((pos2.x-pos.x)^2 + (pos2.y-pos.y)^2 + (pos2.z-pos.z)^2))

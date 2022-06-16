@@ -24,11 +24,9 @@
 -- added rain damage.
 -- fixed the grass_with_dirt issue.
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator("mobs_mc")
 
-local vector = vector
-
-local function telesound(pos, is_source)
+local telesound = function(pos, is_source)
 	local snd
 	if is_source then
 		snd = "mobs_mc_enderman_teleport_src"
@@ -49,6 +47,37 @@ local take_frequency_min = 235
 local take_frequency_max = 245
 local place_frequency_min = 235
 local place_frequency_max = 245
+
+
+-- Texuture overrides for enderman block. Required for cactus because it's original is a nodebox
+-- and the textures have tranparent pixels.
+local block_texture_overrides
+do
+	local cbackground = "mobs_mc_enderman_cactus_background.png"
+	local ctiles = minetest.registered_nodes["mcl_core:cactus"].tiles
+
+	local ctable = {}
+	local last
+	for i=1, 6 do
+		if ctiles[i] then
+			last = ctiles[i]
+		end
+		table.insert(ctable, cbackground .. "^" .. last)
+	end
+
+	block_texture_overrides = {
+		["mcl_core:cactus"] = ctable,
+		-- FIXME: replace colorize colors with colors from palette
+		["mcl_core:dirt_with_grass"] =
+		{
+		"mcl_core_grass_block_top.png^[colorize:green:90",
+		"default_dirt.png",
+		"default_dirt.png^(mcl_core_grass_block_side_overlay.png^[colorize:green:90)",
+		"default_dirt.png^(mcl_core_grass_block_side_overlay.png^[colorize:green:90)",
+		"default_dirt.png^(mcl_core_grass_block_side_overlay.png^[colorize:green:90)",
+		"default_dirt.png^(mcl_core_grass_block_side_overlay.png^[colorize:green:90)"}
+	}
+end
 
 -- Create the textures table for the enderman, depending on which kind of block
 -- the enderman holds (if any).
@@ -71,9 +100,9 @@ local create_enderman_textures = function(block_type, itemstring)
 		local tiles = minetest.registered_nodes[itemstring].tiles
 		local textures = {}
 		local last
-		if mobs_mc.enderman_block_texture_overrides[itemstring] then
+		if block_texture_overrides[itemstring] then
 			-- Texture override available? Use these instead!
-			textures = mobs_mc.enderman_block_texture_overrides[itemstring]
+			textures = block_texture_overrides[itemstring]
 		else
 			-- Extract the texture names
 			for i = 1, 6 do
@@ -191,23 +220,22 @@ end
 
 local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
 
-mobs:register_mob("mobs_mc:enderman", {
+mcl_mobs:register_mob("mobs_mc:enderman", {
 	description = S("Enderman"),
 	type = "monster",
 	spawn_class = "passive",
-	neutral = true,
+	passive = true,
+	pathfinding = 1,
 	hp_min = 40,
 	hp_max = 40,
 	xp_min = 5,
 	xp_max = 5,
-	rotate = 270,
 	collisionbox = {-0.3, -0.01, -0.3, 0.3, 2.89, 0.3},
 	visual = "mesh",
 	mesh = "mobs_mc_enderman.b3d",
 	textures = create_enderman_textures(),
 	visual_size = {x=3, y=3},
 	makes_footstep_sound = true,
-	eye_height = 2.5,
 	sounds = {
 		-- TODO: Custom war cry sound
 		war_cry = "mobs_sandmonster",
@@ -216,33 +244,17 @@ mobs:register_mob("mobs_mc:enderman", {
 		random = {name="mobs_mc_enderman_random", gain=0.5},
 		distance = 16,
 	},
-	walk_velocity = 1,
-	run_velocity = 4,
+	walk_velocity = 0.2,
+	run_velocity = 3.4,
 	damage = 7,
 	reach = 2,
 	drops = {
-		{name = mobs_mc.items.ender_pearl,
+		{name = "mcl_throwing:ender_pearl",
 		chance = 1,
 		min = 0,
 		max = 1,
 		looting = "common"},
 	},
-
-	--head code
-	has_head = false,
-	head_bone = "head.low",
-
-	swap_y_with_x = false,
-	reverse_head_yaw = false,
-
-	head_bone_pos_y = 2.4,
-	head_bone_pos_z = 0,
-
-	head_height_offset = 1.1,
-	head_direction_offset = 0,
-	head_pitch_modifier = 0,
-	--end head code
-
 	animation = select_enderman_animation("normal"),
 	_taken_node = "",
 	do_custom = function(self, dtime)
@@ -301,10 +313,10 @@ mobs:register_mob("mobs_mc:enderman", {
 				--self:teleport(nil)
 				--self.state = ""
 			--else
-				if self.attacking then
-					local target = self.attacking
+				if self.attack then
+					local target = self.attack
 					local pos = target:get_pos()
-					if pos then
+					if pos ~= nil then
 						if vector.distance(self.object:get_pos(), target:get_pos()) > 10 then
 							self:teleport(target)
 						end
@@ -320,12 +332,12 @@ mobs:register_mob("mobs_mc:enderman", {
 		for n = 1, #objs do
 			local obj = objs[n]
 			if obj then
-				--if minetest.is_player(obj) then
+				if minetest.is_player(obj) then
 					-- Warp from players during day.
 					--if (minetest.get_timeofday() * 24000) > 5001 and (minetest.get_timeofday() * 24000) < 19000 then
 					--	self:teleport(nil)
 					--end
-				if not obj:is_player() then
+				else
 					local lua = obj:get_luaentity()
 					if lua then
 						if lua.name == "mcl_bows:arrow_entity" or lua.name == "mcl_throwing:snowball_entity" then
@@ -343,8 +355,8 @@ mobs:register_mob("mobs_mc:enderman", {
 			--	self:teleport(nil)
 			--	self.state = ""
 			--else
-				if self.attack and not minetest.settings:get_bool("creative_mode") then
-					self.state = "attack"
+				if self.attack ~= nil and not minetest.settings:get_bool("creative_mode") then
+					self.state = 'attack'
 				end
 			--end
 		end
@@ -379,16 +391,11 @@ mobs:register_mob("mobs_mc:enderman", {
 						--if looking in general head position, turn hostile
 						if minetest.line_of_sight(ender_eye_pos, look_pos_base) and vector.distance(look_pos, ender_eye_pos) <= 0.4 then
 							self.provoked = "staring"
-							self.state = "stand"
-							self.hostile = false
+							self.attack = minetest.get_player_by_name(obj:get_player_name())
 							break
-						--begin attacking the player
-						else
+						else -- I'm not sure what this part does, but I don't want to break anything - jordan4ibanez
 							if self.provoked == "staring" then
 								self.provoked = "broke_contact"
-								self.hostile = true
-								self.state = "attack"
-								self.attacking = obj
 							end
 						end
 
@@ -412,20 +419,17 @@ mobs:register_mob("mobs_mc:enderman", {
 			self._take_place_timer = 0
 			self._next_take_place_time = math.random(place_frequency_min, place_frequency_max)
 			local pos = self.object:get_pos()
-			local takable_nodes = minetest.find_nodes_in_area_under_air({x=pos.x-2, y=pos.y-1, z=pos.z-2}, {x=pos.x+2, y=pos.y+1, z=pos.z+2}, mobs_mc.enderman_takable)
+			local takable_nodes = minetest.find_nodes_in_area_under_air({x=pos.x-2, y=pos.y-1, z=pos.z-2}, {x=pos.x+2, y=pos.y+1, z=pos.z+2}, "group:enderman_takable")
 			if #takable_nodes >= 1 then
 				local r = pr:next(1, #takable_nodes)
 				local take_pos = takable_nodes[r]
 				local node = minetest.get_node(take_pos)
 				-- Don't destroy protected stuff.
 				if not minetest.is_protected(take_pos, "") then
-					local dug = minetest.dig_node(take_pos)
-					if dug then
-						if mobs_mc.enderman_replace_on_take[node.name] then
-							self._taken_node = mobs_mc.enderman_replace_on_take[node.name]
-						else
-							self._taken_node = node.name
-						end
+					minetest.remove_node(take_pos)
+					local dug = minetest.get_node_or_nil(take_pos)
+					if dug and dug.name == "air" then
+						self._taken_node = node.name
 						local def = minetest.registered_nodes[self._taken_node]
 						-- Update animation and texture accordingly (adds visibly carried block)
 						local block_type
@@ -454,14 +458,14 @@ mobs:register_mob("mobs_mc:enderman", {
 						self.base_texture = create_enderman_textures(block_type, self._taken_node)
 						self.object:set_properties({ textures = self.base_texture })
 						self.animation = select_enderman_animation("block")
-						mobs.set_mob_animation(self, self.animation.current)
+						mcl_mobs:set_animation(self, self.animation.current)
 						if def.sounds and def.sounds.dug then
 							minetest.sound_play(def.sounds.dug, {pos = take_pos, max_hear_distance = 16}, true)
 						end
 					end
 				end
 			end
-		elseif self._taken_node and self._taken_node ~= "" and self._take_place_timer >= self._next_take_place_time then
+		elseif self._taken_node ~= nil and self._taken_node ~= "" and self._take_place_timer >= self._next_take_place_time then
 			-- Place taken node
 			self._take_place_timer = 0
 			self._next_take_place_time = math.random(take_frequency_min, take_frequency_max)
@@ -477,7 +481,7 @@ mobs:register_mob("mobs_mc:enderman", {
 					local def = minetest.registered_nodes[self._taken_node]
 					-- Update animation accordingly (removes visible block)
 					self.animation = select_enderman_animation("normal")
-					mobs.set_mob_animation(self, self.animation.current)
+					mcl_mobs:set_animation(self, self.animation.current)
 					if def.sounds and def.sounds.place then
 						minetest.sound_play(def.sounds.place, {pos = place_pos, max_hear_distance = 16}, true)
 					end
@@ -487,12 +491,12 @@ mobs:register_mob("mobs_mc:enderman", {
 		end
 	end,
 	do_teleport = function(self, target)
-		if target then
+		if target ~= nil then
 			local target_pos = target:get_pos()
 			-- Find all solid nodes below air in a 10×10×10 cuboid centered on the target
 			local nodes = minetest.find_nodes_in_area_under_air(vector.subtract(target_pos, 5), vector.add(target_pos, 5), {"group:solid", "group:cracky", "group:crumbly"})
 			local telepos
-			if nodes then
+			if nodes ~= nil then
 				if #nodes > 0 then
 					-- Up to 64 attempts to teleport
 					for n=1, math.min(64, #nodes) do
@@ -502,7 +506,8 @@ mobs:register_mob("mobs_mc:enderman", {
 						-- Selected node needs to have 3 nodes of free space above
 						for u=1, 3 do
 							local node = minetest.get_node({x=nodepos.x, y=nodepos.y+u, z=nodepos.z})
-							if minetest.registered_nodes[node.name].walkable then
+							local ndef = minetest.registered_nodes[node.name]
+							if ndef and ndef.walkable then
 								node_ok = false
 								break
 							end
@@ -527,7 +532,7 @@ mobs:register_mob("mobs_mc:enderman", {
 				-- We need to add (or subtract) different random numbers to each vector component, so it couldn't be done with a nice single vector.add() or .subtract():
 				local randomCube = vector.new( pos.x + 8*(pr:next(0,16)-8), pos.y + 8*(pr:next(0,16)-8), pos.z + 8*(pr:next(0,16)-8) )
 				local nodes = minetest.find_nodes_in_area_under_air(vector.subtract(randomCube, 4), vector.add(randomCube, 4), {"group:solid", "group:cracky", "group:crumbly"})
-				if nodes then
+				if nodes ~= nil then
 					if #nodes > 0 then
 						-- Up to 8 low-level (in total up to 8*8 = 64) attempts to teleport
 						for n=1, math.min(8, #nodes) do
@@ -536,7 +541,8 @@ mobs:register_mob("mobs_mc:enderman", {
 							node_ok = true
 							for u=1, 3 do
 								local node = minetest.get_node({x=nodepos.x, y=nodepos.y+u, z=nodepos.z})
-								if minetest.registered_nodes[node.name].walkable then
+								local ndef = minetest.registered_nodes[node.name]
+								if ndef and ndef.walkable then
 									node_ok = false
 									break
 								end
@@ -559,13 +565,13 @@ mobs:register_mob("mobs_mc:enderman", {
 	end,
 	on_die = function(self, pos)
 		-- Drop carried node on death
-		if self._taken_node and self._taken_node ~= "" then
+		if self._taken_node ~= nil and self._taken_node ~= "" then
 			minetest.add_item(pos, self._taken_node)
 		end
 	end,
 	do_punch = function(self, hitter, tflp, tool_caps, dir)
 		-- damage from rain caused by itself so we don't want it to attack itself.
-		if hitter ~= self.object and hitter then
+		if hitter ~= self.object and hitter ~= nil then
 			--if (minetest.get_timeofday() * 24000) > 5001 and (minetest.get_timeofday() * 24000) < 19000 then
 			--	self:teleport(nil)
 			--else
@@ -581,12 +587,12 @@ mobs:register_mob("mobs_mc:enderman", {
 	water_damage = 8,
 	view_range = 64,
 	fear_height = 4,
-	attack_type = "punch",
+	attack_type = "dogfight",
 })
 
 
 -- End spawn
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:enderman",
 "end",
 "ground",
@@ -598,10 +604,10 @@ minetest.LIGHT_MAX+1,
 30,
 3000,
 12,
-mobs_mc.spawn_height.end_min,
-mobs_mc.spawn_height.end_max)
+mcl_vars.mg_end_min,
+mcl_vars.mg_end_max)
 -- Overworld spawn
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:enderman",
 "overworld",
 "ground",
@@ -751,11 +757,11 @@ mobs:spawn_specific(
 30,
 19000,
 2,
-mobs_mc.spawn_height.overworld_min,
-mobs_mc.spawn_height.overworld_max)
+mcl_vars.mg_overworld_min,
+mcl_vars.mg_overworld_max)
 
 -- Nether spawn (rare)
-mobs:spawn_specific(
+mcl_mobs:spawn_specific(
 "mobs_mc:enderman",
 "nether",
 "ground",
@@ -767,8 +773,8 @@ mobs:spawn_specific(
 30,
 27500,
 4,
-mobs_mc.spawn_height.nether_min,
-mobs_mc.spawn_height.nether_max)
+mcl_vars.mg_nether_min,
+mcl_vars.mg_nether_max)
 
 -- spawn eggs
-mobs:register_egg("mobs_mc:enderman", S("Enderman"), "mobs_mc_spawn_icon_enderman.png", 0)
+mcl_mobs:register_egg("mobs_mc:enderman", S("Enderman"), "mobs_mc_spawn_icon_enderman.png", 0)

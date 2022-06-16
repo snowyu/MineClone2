@@ -33,9 +33,12 @@ mcl_tnt_griefing (TNT destroys blocks) bool true
 # This setting is only read at startup.
 enable_bed_respawn (Respawn at bed) bool true
 
-# If enabled, the night can be skipped if all players are in bed.
-# This setting is only read at startup.
-enable_bed_night_skip (Skip night when sleeping) bool true
+# How many players have to sleep to skip the night, in percent.
+# Setting to 0 will mean 1 player is always enough to skip the night. Setting above 100 will prevent skipping the night.
+# 100 by default.
+# The setting can be changed ingame using `/set mcl_playersSleepingPercentage <number>`
+mcl_playersSleepingPercentage (Players Sleeping Percentage) int 100
+
 # Normally, players drop all their items when they die. Enable this
 # setting, so players always keep their inventory on death.
 mcl_keepInventory (Keep inventory on death) bool false
@@ -93,9 +96,6 @@ fire_animation_frames (Fire Animation Frames) int 8
 
 # Whether to animate chests when open / close
 animated_chests (Animated chests) bool true
-
-# Whether to preview the player in inventory in 3D (requires Minetest 5.4)
-3d_player_preview (3D Player preview) bool true
 
 # The maximum number of boss bars to simultaniously display on the screen
 max_bossbars (Maximum Boss bars) int 5

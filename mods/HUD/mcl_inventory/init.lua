@@ -60,14 +60,6 @@ local function set_inventory(player, armor_change_only)
 	inv:set_width("craft", 2)
 	inv:set_size("craft", 4)
 
-	-- Show armor and player image
-	local player_preview
-	if minetest.settings:get_bool("3d_player_preview", true) then
-		player_preview = mcl_player.get_player_formspec_model(player, 1.0, 0.0, 2.25, 4.5, "")
-	else
-		player_preview = "image[1.1,0.2;2,4;"..mcl_player.player_get_preview(player).."]"
-	end
-
 	local armor_slots = {"helmet", "chestplate", "leggings", "boots"}
 	local armor_slot_imgs = ""
 	for a=1,4 do
@@ -76,9 +68,13 @@ local function set_inventory(player, armor_change_only)
 		end
 	end
 
+	if inv:get_stack("offhand", 1):is_empty() then
+		armor_slot_imgs = armor_slot_imgs .. "image[3,2;1,1;mcl_inventory_empty_armor_slot_shield.png]"
+	end
+
 	local form = "size[9,8.75]"..
 	"background[-0.19,-0.25;9.41,9.49;crafting_formspec_bg.png]"..
-	player_preview..
+	mcl_player.get_player_formspec_model(player, 1.0, 0.0, 2.25, 4.5, "")..
 	--armor
 	"list[current_player;armor;0,0;1,1;1]"..
 	"list[current_player;armor;0,1;1,1;2]"..
@@ -88,6 +84,8 @@ local function set_inventory(player, armor_change_only)
 	mcl_formspec.get_itemslot_bg(0,1,1,1)..
 	mcl_formspec.get_itemslot_bg(0,2,1,1)..
 	mcl_formspec.get_itemslot_bg(0,3,1,1)..
+	"list[current_player;offhand;3,2;1,1]"..
+	mcl_formspec.get_itemslot_bg(3,2,1,1)..
 	armor_slot_imgs..
 	-- craft and inventory
 	"label[0,4;"..F(minetest.colorize("#313131", S("Inventory"))).."]"..
@@ -148,8 +146,10 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	--init inventory
-	player:get_inventory():set_width("main", 9)
-	player:get_inventory():set_size("main", 36)
+	local inv = player:get_inventory()
+	inv:set_width("main", 9)
+	inv:set_size("main", 36)
+	inv:set_size("offhand", 1)
 
 	--set hotbar size
 	player:hud_set_hotbar_itemcount(9)
@@ -177,7 +177,66 @@ minetest.register_on_joinplayer(function(player)
 	return_fields(player, "enchanting_lapis")
 end)
 
-if minetest.is_creative_enabled("") then
-	dofile(minetest.get_modpath(minetest.get_current_modname()).."/creative.lua")
+
+dofile(minetest.get_modpath(minetest.get_current_modname()).."/creative.lua")
+
+local mt_is_creative_enabled = minetest.is_creative_enabled
+
+function minetest.is_creative_enabled(name)
+	if mt_is_creative_enabled(name) then return true end
+	local p = minetest.get_player_by_name(name)
+	if p then
+		return p:get_meta():get_string("gamemode") == "creative"
+	end
+	return false
 end
 
+local function in_table(n,h)
+	for k,v in pairs(h) do
+		if v == n then return true end
+	end
+	return false
+end
+
+local gamemodes = {
+	"survival",
+	"creative"
+}
+
+function mcl_inventory.player_set_gamemode(p,g)
+	local m = p:get_meta()
+	m:set_string("gamemode",g)
+	if g == "survival" then
+		 mcl_experience.setup_hud(p)
+		 mcl_experience.update(p)
+	elseif g == "creative" then
+		 mcl_experience.remove_hud(p)
+	end
+	set_inventory(p)
+end
+
+minetest.register_chatcommand("gamemode",{
+	params = S("[<gamemode>] [<player>]"),
+	description = S("Change gamemode (survival/creative) for yourself or player"),
+	privs = { server = true },
+	func = function(n,param)
+		-- Full input validation ( just for @erlehmann <3 )
+		local p = minetest.get_player_by_name(n)
+		local args = param:split(" ")
+		if args[2] ~= nil then
+			p = minetest.get_player_by_name(args[2])
+		end
+		if not p then
+			return false, S("Player not online")
+		end
+		if args[1] ~= nil and not in_table(args[1],gamemodes) then
+			return false, S("Gamemode " .. args[1] .. " does not exist.")
+		elseif args[1] ~= nil then
+			mcl_inventory.player_set_gamemode(p,args[1])
+		end
+		--Result message - show effective game mode
+		local gm = p:get_meta():get_string("gamemode")
+		if gm == "" then gm = gamemodes[1] end
+		return true, S("Gamemode for player ")..n..S(": "..gm)
+	end
+})

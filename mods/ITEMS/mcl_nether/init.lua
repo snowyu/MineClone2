@@ -106,7 +106,8 @@ minetest.register_node("mcl_nether:magma", {
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	-- From walkover mod
 	on_walk_over = function(loc, nodeiamon, player)
-		if player and player:get_player_control().sneak or minetest.global_exists("mcl_potions") and mcl_potions.player_has_effect(player, "fire_proof") then
+		local armor_feet = player:get_inventory():get_stack("armor", 5)
+		if player and player:get_player_control().sneak or (minetest.global_exists("mcl_enchanting") and mcl_enchanting.has_enchantment(armor_feet, "frost_walker")) or (minetest.global_exists("mcl_potions") and mcl_potions.player_has_effect(player, "fire_proof")) then
 			return
 		end
 		-- Hurt players standing on top of this block
@@ -129,7 +130,7 @@ minetest.register_node("mcl_nether:soul_sand", {
 	stack_max = 64,
 	tiles = {"mcl_nether_soul_sand.png"},
 	is_ground_content = true,
-	groups = {handy=1,shovely=1, building_block=1,soil_nether_wart=1, material_sand=1},
+	groups = {handy = 1, shovely = 1, building_block = 1, soil_nether_wart = 1, material_sand = 1, soul_block = 1 },
 	collision_box = {
 		type = "fixed",
 		fixed = { -0.5, -0.5, -0.5, 0.5, 0.5 - 2/16, 0.5 },
@@ -173,7 +174,7 @@ minetest.register_node("mcl_nether:nether_wart_block", {
 	stack_max = 64,
 	tiles = {"mcl_nether_nether_wart_block.png"},
 	is_ground_content = false,
-	groups = {handy=1, hoey=1, building_block=1},
+	groups = {handy=1, hoey=1, building_block=1, compostability = 85},
 	sounds = mcl_sounds.node_sound_leaves_defaults(
 		{
 			footstep={name="default_dirt_footstep", gain=0.7},

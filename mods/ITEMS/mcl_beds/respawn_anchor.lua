@@ -39,6 +39,9 @@ for i=0,4 do
 		elseif string.match(node.name, "mcl_beds:respawn_anchor_charged_") then
 			minetest.chat_send_player(player.get_player_name(player), S"New respawn position set!")
 			mcl_spawn.set_spawn_pos(player, pos, nil)
+			if i == 4 then
+				awards.unlock(player:get_player_name(), "mcl:notQuiteNineLives")
+			end
 		end
 	end
 
@@ -88,11 +91,11 @@ for i=0,4 do
  end
 
 
-minetest.register_craft({ --TODO: Please change this crafting recipe once crying obsidian is implemented!
+minetest.register_craft({
 	output = "mcl_beds:respawn_anchor",
 	recipe = {
-			{"mcl_core:obsidian", "mcl_core:obsidian", "mcl_core:obsidian"},
+			{"mcl_core:crying_obsidian", "mcl_core:crying_obsidian", "mcl_core:crying_obsidian"},
 			{"mcl_nether:glowstone", "mcl_nether:glowstone", "mcl_nether:glowstone"},
-			{"mcl_core:obsidian", "mcl_core:obsidian", "mcl_core:obsidian"}
+			{"mcl_core:crying_obsidian", "mcl_core:crying_obsidian", "mcl_core:crying_obsidian"}
 		}
 	})

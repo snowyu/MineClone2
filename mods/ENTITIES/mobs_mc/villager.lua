@@ -427,7 +427,7 @@ local professions = {
 				"mobs_mc_villager_weaponsmith.png",
 				"mobs_mc_villager_weaponsmith.png",
 			},
-		jobsite = "mcl_furnaces:furnace", --FIXME: grindstone
+		jobsite = "mcl_grindstone:grindstone",
 		trades = {
 			{
 			{ { "mcl_core:coal_lump", 15, 15 }, E1 },
@@ -458,7 +458,7 @@ local professions = {
 				"mobs_mc_villager_toolsmith.png",
 				"mobs_mc_villager_toolsmith.png",
 			},
-		jobsite = "mcl_anvils:anvil", --FIXME: smithing table
+		jobsite = "mcl_smithing_table:table",
 		trades = {
 			{
 			{ { "mcl_core:coal_lump", 15, 15 }, E1 },
@@ -613,6 +613,8 @@ local function employ(self,jobsite_pos)
 end
 
 local function look_for_job(self)
+	if self.last_jobhunt and os.time() - self.last_jobhunt < 360 then return end
+	self.last_jobhunt = os.time() + math.random(0,60)
 	local p = self.object:get_pos()
 	local nn = minetest.find_nodes_in_area(vector.offset(p,-48,-48,-48),vector.offset(p,48,48,48),jobsites)
 	for _,n in pairs(nn) do
@@ -1360,15 +1362,17 @@ mcl_mobs:register_mob("mobs_mc:villager", {
 	end,
 
 	on_spawn = function(self)
+		if not self._profession then
+			self._profession = "unemployed"
+			if math.random(100) == 1 then
+				self._profession = "nitwit"
+			end
+		end
 		if self._id then
 			set_textures(self)
 			return
 		end
 		self._id=minetest.sha1(minetest.get_gametime()..minetest.pos_to_string(self.object:get_pos())..tostring(math.random()))
-		self._profession = "unemployed"
-		if math.random(100) == 1 then
-			self._profession = "nitwit"
-		end
 		set_textures(self)
 	end,
 	on_die = function(self, pos)

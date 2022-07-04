@@ -1262,12 +1262,10 @@ end
 
 -- TODO: Try to use more efficient structure generating code
 local function generate_structures(minp, maxp, blockseed, biomemap)
-	local chunk_has_desert_well = false
-	local chunk_has_desert_temple = false
 	local chunk_has_igloo = false
 	local struct_min, struct_max = -3, 111 --64
-
-	if maxp.y >= struct_min and minp.y <= struct_max then
+	--except end exit portall all v6
+	if mg_name == "v6" and maxp.y >= struct_min and minp.y <= struct_max then
 		-- Generate structures
 		local pr = PcgRandom(blockseed)
 		perlin_structures = perlin_structures or minetest.get_perlin(329, 3, 0.6, 100)
@@ -1301,32 +1299,8 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 					local nn0 = minetest.get_node(p).name
 					-- Check if the node can be replaced
 					if minetest.registered_nodes[nn0] and minetest.registered_nodes[nn0].buildable_to then
-						-- Desert temples and desert wells
-						if nn == "mcl_core:sand" or (nn == "mcl_core:sandstone") then
-							if not chunk_has_desert_temple and not chunk_has_desert_well and ground_y > 3 then
-								-- Spawn desert temple
-								-- TODO: Check surface
-								if pr:next(1,12000) == 1 then
-									mcl_structures.call_struct(p, "desert_temple", nil, pr)
-									chunk_has_desert_temple = true
-								end
-							end
-							if not chunk_has_desert_temple and not chunk_has_desert_well and ground_y > 3 then
-								local desert_well_prob = minecraft_chunk_probability(1000, minp, maxp)
-
-								-- Spawn desert well
-								if pr:next(1, desert_well_prob) == 1 then
-									-- Check surface
-									local surface = minetest.find_nodes_in_area({x=p.x,y=p.y-1,z=p.z}, {x=p.x+5, y=p.y-1, z=p.z+5}, "mcl_core:sand")
-									if #surface >= 25 then
-										mcl_structures.call_struct(p, "desert_well", nil, pr)
-										chunk_has_desert_well = true
-									end
-								end
-							end
-
 						-- Igloos
-						elseif not chunk_has_igloo and (nn == "mcl_core:snowblock" or nn == "mcl_core:snow" or (minetest.get_item_group(nn, "grass_block_snow") == 1)) then
+						if not chunk_has_igloo and (nn == "mcl_core:snowblock" or nn == "mcl_core:snow" or (minetest.get_item_group(nn, "grass_block_snow") == 1)) then
 							if pr:next(1, 4400) == 1 then
 								-- Check surface
 								local floor = {x=p.x+9, y=p.y-1, z=p.z+9}
@@ -1357,7 +1331,7 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 							end
 						end
 
-						-- Witch hut
+						-- Witch hut (v6)
 						if ground_y <= 0 and nn == "mcl_core:dirt" then
 						local prob = minecraft_chunk_probability(48, minp, maxp)
 						if pr:next(1, prob) == 1 then
@@ -1365,23 +1339,14 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 							local swampland = minetest.get_biome_id("Swampland")
 							local swampland_shore = minetest.get_biome_id("Swampland_shore")
 
-							-- Where do witches live?
-
-							local here_be_witches = false
-							if mg_name == "v6" then
-								-- v6: In Normal biome
-								if biomeinfo.get_v6_biome(p) == "Normal" then
-									here_be_witches = true
-								end
-							else
-								-- Other mapgens: In swampland biome
-								local bi = xz_to_biomemap_index(p.x, p.z, minp, maxp)
-								if biomemap[bi] == swampland or biomemap[bi] == swampland_shore then
-									here_be_witches = true
-								end
+						-- Where do witches live?
+							-- v6: In Normal biome
+							if biomeinfo.get_v6_biome(p) == "Normal" then
+								here_be_witches = true
 							end
-
+							local here_be_witches = false
 							if here_be_witches then
+
 								local r = tostring(pr:next(0, 3) * 90) -- "0", "90", "180" or 270"
 								local p1 = {x=p.x-1, y=WITCH_HUT_HEIGHT+2, z=p.z-1}
 								local size
@@ -1401,9 +1366,7 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 									-- FIXME: For some mysterious reason (black magic?) this
 									-- function does sometimes NOT spawn the witch hut. One can only see the
 									-- oak wood nodes in the water, but no hut. :-/
-									mcl_structures.call_struct(place, "witch_hut", r, pr)
-
-									-- TODO: Spawn witch in or around hut when the mob sucks less.
+									mcl_structures.place_structure(place,mcl_structures.registered_structures["witch_hut"],pr)
 
 									local function place_tree_if_free(pos, prev_result)
 										local nn = minetest.get_node(pos).name
@@ -1462,7 +1425,7 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 
 						-- Ice spikes in v6
 						-- In other mapgens, ice spikes are generated as decorations.
-						if mg_name == "v6" and not chunk_has_igloo and nn == "mcl_core:snowblock" then
+						if nn == "mcl_core:snowblock" then
 							local spike = pr:next(1,58000)
 							if spike < 3 then
 								-- Check surface
@@ -1472,7 +1435,7 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 								local spruce_collisions = minetest.find_nodes_in_area({x=p.x+1,y=p.y+2,z=p.z+1}, {x=p.x+4, y=p.y+6, z=p.z+4}, {"mcl_core:sprucetree", "mcl_core:spruceleaves"})
 
 								if #surface >= 9 and #spruce_collisions == 0 then
-									mcl_structures.call_struct(p, "ice_spike_large", nil, pr)
+									mcl_structures.place_structure(p,mcl_structures.registered_structures["ice_spike_large"],pr)
 								end
 							elseif spike < 100 then
 								-- Check surface
@@ -1483,7 +1446,7 @@ local function generate_structures(minp, maxp, blockseed, biomemap)
 								local spruce_collisions = minetest.find_nodes_in_area({x=p.x+1,y=p.y+1,z=p.z+1}, {x=p.x+6, y=p.y+6, z=p.z+6}, {"mcl_core:sprucetree", "mcl_core:spruceleaves"})
 
 								if #surface >= 25 and #spruce_collisions == 0 then
-									mcl_structures.call_struct(p, "ice_spike_small", nil, pr)
+									mcl_structures.place_structure(p,mcl_structures.registered_structures["ice_spike_small"],pr)
 								end
 							end
 						end
@@ -1720,7 +1683,7 @@ local function generate_tree_decorations(minp, maxp, seed, data, param2_data, ar
 end
 
 -- Generate mushrooms in caves manually.
--- Minetest's API does not support decorations in caves yet. :-(
+-- only v6. minetest supports cave decos via "all_floors" flag now
 local function generate_underground_mushrooms(minp, maxp, seed)
 	local pr_shroom = PseudoRandom(seed-24359)
 	-- Generate rare underground mushrooms
@@ -1747,14 +1710,9 @@ local function generate_underground_mushrooms(minp, maxp, seed)
 	end
 end
 
-local nether_wart_chance
-if mg_name == "v6" then
-	nether_wart_chance = 85
-else
-	nether_wart_chance = 170
-end
 -- Generate Nether decorations manually: Eternal fire, mushrooms, nether wart
--- Minetest's API does not support decorations in caves yet. :-(
+-- (only v6)
+local nether_wart_chance = 85
 local function generate_nether_decorations(minp, maxp, seed)
 	local pr_nether = PseudoRandom(seed+667)
 
@@ -1778,9 +1736,7 @@ local function generate_nether_decorations(minp, maxp, seed)
 
 			spawn_func(bpos)
 		end
-
 	end
-
 	-- Eternal fire on netherrack
 	special_deco(rack, function(bpos)
 		-- Eternal fire on netherrack
@@ -1817,7 +1773,6 @@ local function generate_nether_decorations(minp, maxp, seed)
 			minetest.set_node(bpos, {name = "mcl_nether:nether_wart"})
 		end
 	end)
-
 end
 
 minetest.register_on_generated(function(minp, maxp, blockseed)
@@ -2201,10 +2156,33 @@ end
 local function basic_node(minp, maxp, blockseed)
 	if mg_name ~= "singlenode" then
 		-- Generate special decorations
-		generate_underground_mushrooms(minp, maxp, blockseed)
-		generate_nether_decorations(minp, maxp, blockseed)
+		if mg_name == "v6" then
+			generate_underground_mushrooms(minp, maxp, blockseed)
+			generate_nether_decorations(minp, maxp, blockseed)
+		end
 		generate_structures(minp, maxp, blockseed, minetest.get_mapgen_object("biomemap"))
 	end
 end
 
 mcl_mapgen_core.register_generator("main", basic, basic_node, 1, true)
+
+mcl_mapgen_core.register_generator("structures",nil, function(minp, maxp, blockseed)
+	local gennotify = minetest.get_mapgen_object("gennotify")
+	local pr = PseudoRandom(blockseed + 42)
+	local has_struct = {}
+	local poshash = minetest.hash_node_position(minp)
+	for _,struct in pairs(mcl_structures.registered_structures) do
+		if struct.deco_id then
+			local has = false
+			if has_struct[struct.name] == nil then has_struct[struct.name] = {}	end
+			for _, pos in pairs(gennotify["decoration#"..struct.deco_id] or {}) do
+				local realpos = vector.offset(pos,0,1,0)
+				minetest.remove_node(realpos)
+				if struct.chunk_probability == nil or (not has and pr:next(1,struct.chunk_probability) == 1 ) then
+					mcl_structures.place_structure(realpos,struct,pr)
+					has=true
+				end
+			end
+		end
+	end
+end, 100, true)

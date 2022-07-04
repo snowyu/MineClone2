@@ -3,3 +3,5 @@
 *.blend1
 *.blend2
 *.blend3
+# translation backup files
+*.old

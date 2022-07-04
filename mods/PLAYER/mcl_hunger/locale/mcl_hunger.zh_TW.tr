@@ -1,5 +1,5 @@
 # textdomain: mcl_hunger
-@1 succumbed to the poison.=
+@1 succumbed to the poison.=@1 中毒了
 Food=食物
 Saturation=飽食度
 %s: %.1f/%d=

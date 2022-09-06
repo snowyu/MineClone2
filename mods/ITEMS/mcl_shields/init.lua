@@ -31,12 +31,12 @@ minetest.register_tool("mcl_shields:shield", {
 		shield = 1,
 		weapon = 1,
 		enchantability = -1,
-		no_wieldview = 1,
 		offhand_item = 1,
 	},
 	sound = {breaks = "default_tool_breaks"},
 	_repair_material = "group:wood",
 	wield_scale = vector.new(2, 2, 2),
+	_mcl_wieldview_item = "",
 })
 
 local function wielded_item(obj, i)
@@ -219,12 +219,11 @@ end
 local shield_hud = {}
 
 local function remove_shield_hud(player)
-	if shield_hud[player] then
-		player:hud_remove(shield_hud[player])
-		shield_hud[player] = nil
-		set_shield(player, false, 1)
-		set_shield(player, false, 2)
-	end
+	if not shield_hud[player] then return end --this function takes a long time. only run it when necessary
+	player:hud_remove(shield_hud[player])
+	shield_hud[player] = nil
+	set_shield(player, false, 1)
+	set_shield(player, false, 2)
 
 	local hf = player:hud_get_flags()
 	if not hf.wielditem then
@@ -275,8 +274,15 @@ local function handle_blocking(player)
 			player_shield.blocking = 2
 		end
 	elseif shield_in_offhand then
-		local offhand_can_block = (wielded_item(player) == "" or not mcl_util.get_pointed_thing(player, true))
+		local pointed_thing = mcl_util.get_pointed_thing(player, true)
+		local offhand_can_block = (wielded_item(player) == "" or not pointed_thing)
 		and (minetest.get_item_group(wielded_item(player), "bow") ~= 1 and minetest.get_item_group(wielded_item(player), "crossbow") ~= 1)
+
+		if pointed_thing and pointed_thing.type == "node" then
+			if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "container") > 1 then
+				return
+			end
+		end
 
 		if not offhand_can_block then
 			return
@@ -432,7 +438,6 @@ for _, colortab in pairs(mcl_banners.colors) do
 			shield = 1,
 			weapon = 1,
 			enchantability = -1,
-			no_wieldview = 1,
 			not_in_creative_inventory = 1,
 			offhand_item = 1,
 		},
@@ -440,6 +445,7 @@ for _, colortab in pairs(mcl_banners.colors) do
 		_repair_material = "group:wood",
 		wield_scale = vector.new(2, 2, 2),
 		_shield_color = colortab[4],
+		_mcl_wieldview_item = "",
 	})
 
 	local banner = "mcl_banners:banner_item_" .. color

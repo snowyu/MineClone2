@@ -136,8 +136,7 @@ local professions = {
 			{
 			{ { "mcl_fishing:fish_raw", 6, 15,}, E1 },
 			{ { "mcl_fishing:salmon_raw", 6, 6, "mcl_core:emerald", 1, 1 },{ "mcl_fishing:salmon_cooked", 6, 6 } },
-			-- FIXME missing campfire
-			--	{{ "mcl_core:emerald", 1, 2 },{"mcl_campfires:campfire",1,1} },
+			{ { "mcl_core:emerald", 1, 2 },{"mcl_campfires:campfire_lit",1,1} },
 			},
 			{
 			{ { "mcl_fishing:salmon_raw", 6, 13,}, E1 },
@@ -592,6 +591,51 @@ local function go_home(entity)
 	end)
 end
 
+local function has_golem(pos)
+	local r = false
+	for _,o in pairs(minetest.get_objects_inside_radius(pos,16)) do
+		local l = o:get_luaentity()
+		if l and l.name == "mobs_mc:iron_golem" then return true end
+	end
+end
+
+local function has_summon_participants(self)
+	local r = 0
+	for _,o in pairs(minetest.get_objects_inside_radius(self.object:get_pos(),10)) do
+		local l = o:get_luaentity()
+		--TODO check for panicking or gossiping
+		if l and l.name == "mobs_mc:villager" then r = r + 1 end
+	end
+	return r > 2
+end
+
+local function summon_golem(self)
+	vector.offset(self.object:get_pos(),-10,-10,-10)
+	local nn = minetest.find_nodes_in_area_under_air(vector.offset(self.object:get_pos(),-10,-10,-10),vector.offset(self.object:get_pos(),10,10,10),{"group:solid","group:water"})
+	table.shuffle(nn)
+	for _,n in pairs(nn) do
+		local up = minetest.find_nodes_in_area(vector.offset(n,0,1,0),vector.offset(n,0,3,0),{"air"})
+		if up and #up >= 3 then
+			minetest.sound_play("mcl_portals_open_end_portal", {pos=n, gain=0.5, max_hear_distance = 16}, true)
+			return minetest.add_entity(vector.offset(n,0,1,0),"mobs_mc:iron_golem")
+		end
+	end
+end
+
+local function check_summon(self,dtime)
+	-- TODO has selpt in last 20?
+	if self._summon_timer and self._summon_timer > 30 then
+		local pos = self.object:get_pos()
+		self._summon_timer = 0
+		if has_golem(pos) then return false end
+		if not has_summon_participants(self) then return end
+		summon_golem(self)
+	elseif self._summon_timer == nil  then
+		self._summon_timer = 0
+	end
+	self._summon_timer = self._summon_timer + dtime
+end
+
 ----- JOBSITE LOGIC
 local function get_profession_by_jobsite(js)
 	for k,v in pairs(professions) do
@@ -630,6 +674,7 @@ local function look_for_job(self)
 end
 
 local function get_a_job(self)
+	if self.child then return end
 	local p = self.object:get_pos()
 	local n = minetest.find_node_near(p,1,jobsites)
 	if n and employ(self,n) then return true end
@@ -642,6 +687,7 @@ local function check_jobsite(self)
 	local m = minetest.get_meta(self._jobsite)
 	if m:get_string("villager") ~= self._id then
 		self._profession = "unemployed"
+		self._trades = nil
 		set_textures(self)
 	end
 end
@@ -664,7 +710,6 @@ end
 local function init_trades(self, inv)
 	local profession = professions[self._profession]
 	local trade_tiers = profession.trades
-	self._traded = true
 	if trade_tiers == nil then
 		-- Empty trades
 		self._trades = false
@@ -816,7 +861,7 @@ local function show_trade_formspec(playername, trader, tradenum)
 	.."listring[current_player;main]"
 	.."listring["..tradeinv..";input]"
 	.."listring[current_player;main]"
-	minetest.sound_play("mobs_mc_villager_trade", {to_player = playername}, true)
+	minetest.sound_play("mobs_mc_villager_trade", {to_player = playername,object=trader.object}, true)
 	minetest.show_formspec(playername, tradeinv_name, formspec)
 end
 
@@ -878,13 +923,13 @@ local function update_offer(inv, player, sound)
 			(trade.locked == false)) then
 		inv:set_stack("output", 1, inv:get_stack("offered", 1))
 		if sound then
-			minetest.sound_play("mobs_mc_villager_accept", {to_player = name}, true)
+			minetest.sound_play("mobs_mc_villager_accept", {to_player = name,object=trader.object}, true)
 		end
 		return true
 	else
 		inv:set_stack("output", 1, ItemStack(""))
 		if sound then
-			minetest.sound_play("mobs_mc_villager_deny", {to_player = name}, true)
+			minetest.sound_play("mobs_mc_villager_deny", {to_player = name,object=trader.object}, true)
 		end
 		return false
 	end
@@ -1084,7 +1129,8 @@ local trade_inventory = {
 			if not wanted2:is_empty() then
 				inv:remove_item("input", inv:get_stack("wanted", 2))
 			end
-			minetest.sound_play("mobs_mc_villager_accept", {to_player = player:get_player_name()}, true)
+			local trader = player_trading_with[name]
+			minetest.sound_play("mobs_mc_villager_accept", {to_player = player:get_player_name(),object=trader.object}, true)
 		end
 		update_offer(inv, player, true)
 	end,
@@ -1113,6 +1159,7 @@ local trade_inventory = {
 			local trader = player_trading_with[name]
 			local tradenum = player_tradenum[name]
 			local trades
+			trader._traded = true
 			if trader and trader._trades then
 				trades = minetest.deserialize(trader._trades)
 			end
@@ -1193,10 +1240,11 @@ local trade_inventory = {
 		elseif listname == "input" then
 			update_offer(inv, player, false)
 		end
+		local trader = player_trading_with[name]
 		if accept then
-			minetest.sound_play("mobs_mc_villager_accept", {to_player = name}, true)
+			minetest.sound_play("mobs_mc_villager_accept", {to_player = name,object=trader.object}, true)
 		else
-			minetest.sound_play("mobs_mc_villager_deny", {to_player = name}, true)
+			minetest.sound_play("mobs_mc_villager_deny", {to_player = name,object=trader.object}, true)
 		end
 	end,
 }
@@ -1283,19 +1331,18 @@ mcl_mobs:register_mob("mobs_mc:villager", {
 			end
 		end
 		if clicker then
-			mcl_mobs:feed_tame(self, clicker, 1, true, false)
+			mcl_mobs:feed_tame(self, clicker, 1, true, false, true)
 			return
 		end
 		return true --do not pick up
 	end,
 	on_rightclick = function(self, clicker)
-		local trg=vector.new(0,9,0)
 		if self._jobsite then
 			mcl_mobs:gopath(self,self._jobsite,function()
 				--minetest.log("arrived at jobsite")
 			end)
 		end
-		if self.child or self._profession == "unemployed" then
+		if self.child or self._profession == "unemployed" or self._profession == "nitwit" then
 			return
 		end
 		-- Initiate trading
@@ -1335,6 +1382,7 @@ mcl_mobs:register_mob("mobs_mc:villager", {
 	_player_scan_timer = 0,
 	_trading_players = {}, -- list of playernames currently trading with villager (open formspec)
 	do_custom = function(self, dtime)
+		check_summon(self,dtime)
 		-- Stand still if player is nearby.
 		if not self._player_scan_timer then
 			self._player_scan_timer = 0

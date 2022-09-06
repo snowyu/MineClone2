@@ -91,7 +91,7 @@ minetest.register_chatcommand("clearmobs",{
 			if o.is_mob then
 				if  param == "all" or
 				( param == "nametagged" and o.nametag ) or
-				( param == "" and not o.nametag and not o.tamed ) or
+				( param == "" and ( not o.nametag or o.nametag == "" ) and not o.tamed ) or
 				( num and num > 0 and vector.distance(p:get_pos(),o.object:get_pos()) <= num ) then
 					o.object:remove()
 				end
@@ -213,11 +213,11 @@ end
 local collision = function(self)
 
 	local pos = self.object:get_pos()
+	if not pos then return {0,0} end
 	local vel = self.object:get_velocity()
 	local x = 0
 	local z = 0
 	local width = -self.collisionbox[1] + self.collisionbox[4] + 0.5
-
 	for _,object in pairs(minetest.get_objects_inside_radius(pos, width)) do
 
 		local ent = object:get_luaentity()
@@ -248,18 +248,20 @@ local set_velocity = function(self, v)
 	end
 
 	-- halt mob if it has been ordered to stay
-	if self.order == "stand" then
+	if self.order == "stand" or self.order == "sit" then
 		self.object:set_velocity({x = 0, y = 0, z = 0})
 		return
 	end
 
 	local yaw = (self.object:get_yaw() or 0) + self.rotate
-
-	self.object:set_velocity({
-		x = (sin(yaw) * -v) + c_x,
-		y = self.object:get_velocity().y,
-		z = (cos(yaw) * v) + c_y,
-	})
+	local vv = self.object:get_velocity()
+	if vv then
+		self.object:set_velocity({
+			x = (sin(yaw) * -v) + c_x,
+			y = vv.y,
+			z = (cos(yaw) * v) + c_y,
+		})
+	end
 end
 
 
@@ -298,9 +300,13 @@ local function update_roll(self)
 
 	if is_Fleckenstein then
 		cbox[2], cbox[5] = -cbox[5], -cbox[2]
+		self.object:set_properties({collisionbox = cbox})
+	-- This leads to child mobs having the wrong collisionbox
+	-- and seeing as it seems to be nothing but an easter egg
+	-- i've put it inside the if. Which just makes it be upside
+	-- down lol.
 	end
 
-	self.object:set_properties({collisionbox = cbox})
 end
 
 -- set and return valid yaw
@@ -403,15 +409,15 @@ local set_animation = function(self, anim, fixed_frame)
 
 	if flight_check(self) and self.fly and anim == "walk" then anim = "fly" end
 
-	self.animation.current = self.animation.current or ""
+	self._current_animation = self._current_animation or ""
 
-	if (anim == self.animation.current
+	if (anim == self._current_animation
 	or not self.animation[anim .. "_start"]
 	or not self.animation[anim .. "_end"]) and self.state ~= "die" then
 		return
 	end
 
-	self.animation.current = anim
+	self._current_animation = anim
 
 	local a_start = self.animation[anim .. "_start"]
 	local a_end
@@ -1901,13 +1907,11 @@ local specific_attack = function(list, what)
 	return false
 end
 
--- monster find someone to attack
+-- find someone to attack
 local monster_attack = function(self)
-
-	if self.type ~= "monster"
-	or not damage_enabled
+	if not damage_enabled
 	or minetest.is_creative_enabled("")
-	or self.passive
+	or self.passive ~= false
 	or self.state == "attack"
 	or day_docile(self) then
 		return
@@ -1923,10 +1927,9 @@ local monster_attack = function(self)
 	for n = 1, #objs do
 
 		if objs[n]:is_player() then
-
 			if mcl_mobs.invis[ objs[n]:get_player_name() ] or (not object_in_range(self, objs[n])) then
 				type = ""
-			else
+			elseif (self.type == "monster" or self._aggro) then
 				player = objs[n]
 				type = "player"
 				name = "player"
@@ -2308,9 +2311,9 @@ local function check_doors(self)
 			local def = minetest.registered_nodes[n.name]
 			local closed = n.name:find("_b_1")
 			if t < 0.3 or t > 0.8 then
-				if not closed then def.on_rightclick(d,n,self) end
+				if not closed and def.on_rightclick then def.on_rightclick(d,n,self) end
 			else
-				if closed then def.on_rightclick(d,n,self) end
+				if closed and def.on_rightclick then def.on_rightclick(d,n,self) end
 			end
 
 		end
@@ -2391,9 +2394,13 @@ local do_states = function(self, dtime)
 
 			yaw = set_yaw(self, yaw, 8)
 		end
-
-		set_velocity(self, 0)
-		set_animation(self, "stand")
+		if self.order == "sit" then
+			set_animation(self, "sit")
+			set_velocity(self, 0)
+		else
+			set_animation(self, "stand")
+			set_velocity(self, 0)
+		end
 
 		-- npc's ordered to stand stay standing
 		if self.type ~= "npc"
@@ -2997,6 +3004,7 @@ end
 
 local function check_entity_cramming(self)
 	local p = self.object:get_pos()
+	if not p then return end
 	local oo = minetest.get_objects_inside_radius(p,1)
 	local mobs = {}
 	for _,o in pairs(oo) do
@@ -3342,11 +3350,11 @@ local mob_punch = function(self, hitter, tflp, tool_capabilities, dir)
 	and (self.child == false or self.type == "monster")
 	and hitter:get_player_name() ~= self.owner
 	and not mcl_mobs.invis[ name ] then
-
 		if not die then
 			-- attack whoever punched mob
 			self.state = ""
 			do_attack(self, hitter)
+			self._aggro= true
 		end
 
 		-- alert others to the attack
@@ -3358,7 +3366,6 @@ local mob_punch = function(self, hitter, tflp, tool_capabilities, dir)
 			obj = objs[n]:get_luaentity()
 
 			if obj then
-
 				-- only alert members of same mob or friends
 				if obj.group_attack
 				and obj.state ~= "attack"
@@ -3368,6 +3375,7 @@ local mob_punch = function(self, hitter, tflp, tool_capabilities, dir)
 					elseif type(obj.group_attack) == "table" then
 						for i=1, #obj.group_attack do
 							if obj.name == obj.group_attack[i] then
+								obj._aggro = true
 								do_attack(obj, hitter)
 								break
 							end
@@ -3462,7 +3470,10 @@ local mob_activate = function(self, staticdata, def, dtime)
 			def.textures = {def.textures}
 		end
 
-		self.base_texture = def.textures[random(1, #def.textures)]
+		local c = 1
+		if #def.textures > c then c = #def.textures end
+
+		self.base_texture = def.textures[math.random(c)]
 		self.base_mesh = def.mesh
 		self.base_size = self.visual_size
 		self.base_colbox = self.collisionbox
@@ -3594,12 +3605,27 @@ local mob_activate = function(self, staticdata, def, dtime)
 	end
 end
 
+local function check_aggro(self,dtime)
+	if not self._aggro or not self.attack then return end
+	if not self._check_aggro_timer or self._check_aggro_timer > 5 then
+		self._check_aggro_timer = 0
+		if not self.attack:get_pos() or vector.distance(self.attack:get_pos(),self.object:get_pos()) > 128 then
+			self._aggro = nil
+			self.attack = nil
+			self.state = "stand"
+		end
+	end
+	self._check_aggro_timer = self._check_aggro_timer + dtime
+end
 
 -- main mob function
 local mob_step = function(self, dtime)
 	check_item_pickup(self)
+	check_aggro(self,dtime)
 	if not self.fire_resistant then
 		mcl_burning.tick(self.object, dtime, self)
+		-- mcl_burning.tick may remove object immediately
+		if not self.object:get_pos() then return end
 	end
 
 	local pos = self.object:get_pos()
@@ -3928,7 +3954,7 @@ minetest.register_entity(name, {
 	xp_max = def.xp_max or 0,
 	xp_timestamp = 0,
 	breath_max = def.breath_max or 15,
-        breathes_in_water = def.breathes_in_water or false,
+	breathes_in_water = def.breathes_in_water or false,
 	physical = true,
 	collisionbox = collisionbox,
 	selectionbox = def.selectionbox or def.collisionbox,
@@ -4016,6 +4042,7 @@ minetest.register_entity(name, {
 	teleport = teleport,
 	do_teleport = def.do_teleport,
 	spawn_class = def.spawn_class,
+	can_spawn = def.can_spawn,
 	ignores_nametag = def.ignores_nametag or false,
 	rain_damage = def.rain_damage or 0,
 	glow = def.glow,
@@ -4032,6 +4059,8 @@ minetest.register_entity(name, {
 	fire_resistant = def.fire_resistant or false,
 	fire_damage_resistant = def.fire_damage_resistant or false,
 	ignited_by_sunlight = def.ignited_by_sunlight or false,
+	spawn_in_group = def.spawn_in_group,
+	spawn_in_group_min = def.spawn_in_group_min,
 	-- End of MCL2 extensions
 
 	on_spawn = def.on_spawn,
@@ -4310,7 +4339,8 @@ function mcl_mobs:register_egg(mob, desc, background, addegg, no_creative)
 				pos.y = pos.y - 0.5
 
 				local mob = minetest.add_entity(pos, mob)
-				minetest.log("action", "Mob spawned: "..name.." at "..minetest.pos_to_string(pos))
+				local entityname = itemstack:get_name()
+				minetest.log("action", "Player " ..name.." spawned "..entityname.." at "..minetest.pos_to_string(pos))
 				local ent = mob:get_luaentity()
 
 				-- don't set owner if monster or sneak pressed
@@ -4357,77 +4387,73 @@ end
 
 
 -- feeding, taming and breeding (thanks blert2112)
-function mcl_mobs:feed_tame(self, clicker, feed_count, breed, tame)
+function mcl_mobs:feed_tame(self, clicker, feed_count, breed, tame, notake)
 	if not self.follow then
 		return false
 	end
-
 	-- can eat/tame with item in hand
 	if self.nofollow or follow_holding(self, clicker) then
+		local consume_food = false
 
-		-- if not in creative then take item
-		if not minetest.is_creative_enabled(clicker:get_player_name()) then
+		-- tame if not still a baby
 
-			local item = clicker:get_wielded_item()
-
-			item:take_item()
-
-			clicker:set_wielded_item(item)
+		if tame and not self.child then
+			if not self.owner or self.owner == "" then
+				self.tamed = true
+				self.owner = clicker:get_player_name()
+				consume_food = true
+			end
 		end
 
-		mob_sound(self, "eat", nil, true)
-
 		-- increase health
-		self.health = self.health + 4
 
-		if self.health >= self.hp_max then
-
-			self.health = self.hp_max
+		if self.health < self.hp_max and not consume_food then
+			consume_food = true
+			self.health = min(self.health + 4, self.hp_max)
 
 			if self.htimer < 1 then
 				self.htimer = 5
 			end
+			self.object:set_hp(self.health)
 		end
-
-		self.object:set_hp(self.health)
-
-		update_tag(self)
 
 		-- make children grow quicker
-		if self.child == true then
 
+		if not consume_food and self.child == true then
+			consume_food = true
 			-- deduct 10% of the time to adulthood
 			self.hornytimer = self.hornytimer + ((CHILD_GROW_TIME - self.hornytimer) * 0.1)
-
-			return true
 		end
 
-		-- feed and tame
-		self.food = (self.food or 0) + 1
-		if self.food >= feed_count then
+		--  breed animals
 
-			self.food = 0
-
-			if breed and self.hornytimer == 0 then
+		if breed and not consume_food and self.hornytimer == 0 and not self.horny then
+			self.food = (self.food or 0) + 1
+			consume_food = true
+			if self.food >= feed_count then
+				self.food = 0
 				self.horny = true
 			end
-
-			if tame then
-
-				self.tamed = true
-
-				if not self.owner or self.owner == "" then
-					self.owner = clicker:get_player_name()
-				end
-			end
-
-			-- make sound when fed so many times
-			mob_sound(self, "random", true)
 		end
 
+		update_tag(self)
+		-- play a sound if the animal used the item and take the item if not in creative
+		if consume_food then
+			-- don't consume food if clicker is in creative
+			if not minetest.is_creative_enabled(clicker:get_player_name()) and not notake then
+				local item = clicker:get_wielded_item()
+				item:take_item()
+				clicker:set_wielded_item(item)
+			end
+			-- always play the eat sound if food is used, even in creative
+			mob_sound(self, "eat", nil, true)
+
+		else
+			-- make sound when the mob doesn't want food
+			mob_sound(self, "random", true)
+		end
 		return true
 	end
-
 	return false
 end
 
@@ -4476,31 +4502,6 @@ function mcl_mobs:spawn_child(pos, mob_type)
 
 	return child
 end
-
-
--- compatibility function for old entities to new modpack entities
-function mcl_mobs:alias_mob(old_name, new_name)
-
-	-- spawn egg
-	minetest.register_alias(old_name, new_name)
-
-	-- entity
-	minetest.register_entity(":" .. old_name, {
-
-		physical = false,
-
-		on_step = function(self)
-
-			if minetest.registered_entities[new_name] then
-				minetest.add_entity(self.object:get_pos(), new_name)
-			end
-
-			self.object:remove()
-		end
-	})
-
-end
-
 
 local timer = 0
 minetest.register_globalstep(function(dtime)

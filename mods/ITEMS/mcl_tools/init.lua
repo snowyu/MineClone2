@@ -184,7 +184,7 @@ minetest.register_tool("mcl_tools:pick_netherite", {
 	_doc_items_longdesc = pickaxe_longdesc,
 	inventory_image = "default_tool_netheritepick.png",
 	wield_scale = wield_scale,
-	groups = { tool=1, pickaxe=1, dig_speed_class=6, enchantability=10 },
+	groups = { tool=1, pickaxe=1, dig_speed_class=6, enchantability=10, fire_immune=1 },
 	tool_capabilities = {
 		-- 1/1.2
 		full_punch_interval = 0.83333333,
@@ -288,7 +288,7 @@ minetest.register_tool("mcl_tools:shovel_wood", {
 	_repair_material = "group:wood",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 2, level = 1, uses = 60 }
+		shovely = { speed = 2, level = 2, uses = 60 }
 	},
 })
 minetest.register_tool("mcl_tools:shovel_stone", {
@@ -384,7 +384,7 @@ minetest.register_tool("mcl_tools:shovel_netherite", {
 	_doc_items_usagehelp = shovel_use,
 	inventory_image = "default_tool_netheriteshovel.png",
 	wield_scale = wield_scale,
-	groups = { tool=1, shovel=1, dig_speed_class=6, enchantability=10 },
+	groups = { tool=1, shovel=1, dig_speed_class=6, enchantability=10, fire_immune=1 },
 	tool_capabilities = {
 		full_punch_interval = 1,
 		max_drop_level=5,
@@ -539,7 +539,7 @@ minetest.register_tool("mcl_tools:axe_netherite", {
 	_doc_items_longdesc = axe_longdesc,
 	inventory_image = "default_tool_netheriteaxe.png",
 	wield_scale = wield_scale,
-	groups = { tool=1, axe=1, dig_speed_class=6, enchantability=10 },
+	groups = { tool=1, axe=1, dig_speed_class=6, enchantability=10, fire_immune=1 },
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=5,
@@ -664,7 +664,7 @@ minetest.register_tool("mcl_tools:sword_netherite", {
 	_doc_items_longdesc = sword_longdesc,
 	inventory_image = "default_tool_netheritesword.png",
 	wield_scale = wield_scale,
-	groups = { weapon=1, sword=1, dig_speed_class=5, enchantability=10 },
+	groups = { weapon=1, sword=1, dig_speed_class=5, enchantability=10, fire_immune=1 },
 	tool_capabilities = {
 		full_punch_interval = 0.625,
 		max_drop_level=5,

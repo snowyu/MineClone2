@@ -30,7 +30,7 @@ mcl_weather_thunder_particles (Thunderstorm rain particles) int 900 0
 mcl_weather_snow_particles (Snow particles) int 100 0
 
 # Amount of nether dust particles. You can reduce this to get better FPS (default: 150)
-mcl_weather_snow_particles (Nether dust particles) int 150 0
+mcl_weather_dust_particles (Nether dust particles) int 150 0
 
 # If enabled, breaking blocks will cause them to drop as item.
 # Note that blocks never have drops when in Creative Mode.
@@ -38,6 +38,9 @@ mcl_doTileDrops (Blocks have drops) bool true
 
 # If enabled, TNT explosions destroy blocks.
 mcl_tnt_griefing (TNT destroys blocks) bool true
+
+# Comma separated list of disabled structure names
+mcl_disabled_structures (Disabled structures) string
 
 [Players]
 # If enabled, players respawn at the bed they last lay on instead of normal
@@ -112,6 +115,9 @@ animated_chests (Animated chests) bool true
 # The maximum number of boss bars to simultaniously display on the screen
 max_bossbars (Maximum Boss bars) int 5
 
+# Default intensity of shadows (default: 0.33)
+mcl_default_shadow_intensity (Default shadow intensity) float 0.33 0.0 1.0
+
 [Experimental]
 # Whether ice is translucent. If disabled, ice is fully opaque.
 #
@@ -165,6 +171,10 @@ fix_doubleplants (Mcimport double plant fixes) bool true
 
 # Allow players to create Minecraft-like maps.
 enable_real_maps (Enable Real Maps) bool true
+
+[Additional Features]
+# Enable Bookshelf inventories
+mcl_bookshelf_inventories (Enable bookshelf inventories) bool true
 
 [Debugging]
 # If enabled, this will show the itemstring of an item in the description.

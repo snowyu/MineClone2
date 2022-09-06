@@ -6,9 +6,10 @@ local rabbit = {
 	description = S("Rabbit"),
 	type = "animal",
 	spawn_class = "passive",
+	spawn_in_group_min = 2,
+	spawn_in_group = 3,
 	passive = true,
 	reach = 1,
-
 	hp_min = 3,
 	hp_max = 3,
 	xp_min = 1,
@@ -74,7 +75,7 @@ local rabbit = {
 	},
 	on_rightclick = function(self, clicker)
 		-- Feed, tame protect or capture
-		if mcl_mobs:feed_tame(self, clicker, 1, true, true) then return end
+		if mcl_mobs:feed_tame(self, clicker, 1, true, false) then return end
 		if mcl_mobs:protect(self, clicker) then return end
 		if mcl_mobs:capture_mob(self, clicker, 0, 50, 80, false, nil) then return end
 	end,

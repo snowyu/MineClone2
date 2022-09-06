@@ -33,7 +33,7 @@ mcl_damage.register_modifier(function(obj, damage, reason)
 				local itemname = itemstack:get_name()
 				local enchantments = mcl_enchanting.get_enchantments(itemstack)
 
-				if not flags.bypasses_armor then
+				if not flags.bypasses_armor and minetest.get_item_group(itemname, "non_combat_armor") == 0 then
 					points = points + minetest.get_item_group(itemname, "mcl_armor_points")
 					toughness = toughness + minetest.get_item_group(itemname, "mcl_armor_toughness")
 
@@ -90,6 +90,8 @@ mcl_damage.register_modifier(function(obj, damage, reason)
 
 	if thorns_damage > 0 and reason.type ~= "thorns" and reason.source ~= obj then
 		mcl_util.deal_damage(reason.source, thorns_damage, {type = "thorns", direct = obj})
+		-- mcl_util.deal_damage may remove object immediately
+		if not reason.source:get_pos() then return end
 
 		local thorns_item = thorns_pieces[math.random(#thorns_pieces)]
 

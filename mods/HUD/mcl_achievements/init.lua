@@ -225,6 +225,18 @@ awards.register_achievement("mcl:whatAdeal", {
 	icon = "mcl_core_emerald.png",
 })
 
+awards.register_achievement("mcl:tacticalFishing", {
+	title = S("Tactical Fishing"),
+	description = S("Catch a fish... without a fishing rod!"),
+	icon = "pufferfish_bucket.png",
+})
+
+awards.register_achievement("mcl:witheringHeights", {
+	title = S("Withering Heights"),
+	description = S("Summon the wither from the dead."),
+	icon = "mcl_mobitems_nether_star.png",
+})
+
 -- Triggered in mcl_fishing
 awards.register_achievement("mcl:fishyBusiness", {
 	title = S("Fishy Business"),
@@ -258,6 +270,19 @@ awards.register_achievement("mcl:enchanter", {
 	title = S("Enchanter"),
 	description = S("Enchant an item using an Enchantment Table."),
 	icon = "mcl_enchanting_book_enchanted.png",
+})
+
+--Triggered in mcl_beacons
+awards.register_achievement("mcl:beacon", {
+	title = S("Bring Home the Beacon"),
+	description = S("Use a beacon."),
+	icon = "beacon_achievement_icon.png",
+})
+
+awards.register_achievement("mcl:maxed_beacon", {
+	title = S("Beaconator"),
+	description = S("Use a fully powered beacon."),
+	icon = "beacon_achievement_icon.png",
 })
 
 -- NON-PC ACHIEVEMENTS (XBox, Pocket Edition, etc.)

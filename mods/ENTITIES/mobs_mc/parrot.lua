@@ -13,6 +13,53 @@ local shoulders = {
 	right = vector.new(3.75,10.5,0)
 }
 
+local function table_get_rand(tbl)
+	local keys = {}
+	for k in pairs(tbl) do
+		table.insert(keys, k)
+	end
+	return tbl[keys[math.random(#keys)]]
+end
+
+local function get_random_mob_sound()
+	local t = table.copy(minetest.registered_entities)
+	table.shuffle(t)
+	for _,e in pairs(t) do
+		if e.is_mob and e.sounds and #e.sounds > 0 then
+			return table_get_rand(e.sounds)
+		end
+	end
+	return minetest.registered_entities["mobs_mc:parrot"].sounds.random
+end
+
+local function imitate_mob_sound(self,mob)
+	local snd = mob.sounds.random
+	if not snd or mob.name == "mobs_mc:parrot" or math.random(20) == 1 then
+		snd = get_random_mob_sound()
+	end
+	return minetest.sound_play(snd, {
+		pos = self.object:get_pos(),
+		gain = 1.0,
+		pitch = 2.5,
+		max_hear_distance = self.sounds and self.sounds.distance or 32
+	}, true)
+end
+
+local function check_mobimitate(self,dtime)
+	if not self._mobimitate_timer or self._mobimitate_timer > 30 then
+		self._mobimitate_timer = 0
+		for _,o in pairs(minetest.get_objects_inside_radius(self.object:get_pos(),20)) do
+			local l = o:get_luaentity()
+			if l and l.is_mob and l.name ~= "mobs_mc:parrot" then
+				imitate_mob_sound(self,l)
+				return
+			end
+		end
+	end
+	self._mobimitate_timer = self._mobimitate_timer + dtime
+
+end
+
 --find a free shoulder or return nil
 local function get_shoulder(player)
 	local sh = "left"
@@ -53,7 +100,8 @@ local function check_perch(self,dtime)
 					local n1 = minetest.get_node(vector.offset(p:get_pos(),0,-0.6,0)).name
 					local n2 = minetest.get_node(vector.offset(p:get_pos(),0,0,0)).name
 					local n3 = minetest.get_node(vector.offset(p:get_pos(),0,1,0)).name
-					if n1 == "air" or minetest.get_item_group(n2,"water") > 0 or minetest.get_item_group(n2,"lava") > 0 then
+					if ( n1 == "air" or minetest.get_item_group(n2,"water") > 0 or minetest.get_item_group(n2,"lava") > 0) and
+					not minetest.is_creative_enabled(p:get_player_name()) then
 						o:set_detach()
 						self.detach_timer = 0
 						return
@@ -79,7 +127,7 @@ end
 
 mcl_mobs:register_mob("mobs_mc:parrot", {
 	description = S("Parrot"),
-	type = "npc",
+	type = "passive",
 	spawn_class = "passive",
 	pathfinding = 1,
 	hp_min = 6,
@@ -159,6 +207,7 @@ mcl_mobs:register_mob("mobs_mc:parrot", {
 	end,
 	do_custom = function(self,dtime)
 		check_perch(self,dtime)
+		check_mobimitate(self,dtime)
 	end,
 	do_punch = function(self,puncher) --do_punch is the mcl_mobs_redo variant - it gets called by on_punch later....
 		if self.object:get_attach() == puncher then

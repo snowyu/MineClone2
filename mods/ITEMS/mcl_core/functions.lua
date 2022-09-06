@@ -215,8 +215,8 @@ minetest.register_abm({
 				local posy = pos.y
 				while minetest.get_node(vector.new(pos.x, posy, pos.z)).name == "mcl_core:cactus" do
 					local pos = vector.new(pos.x, posy, pos.z)
-					minetest.remove_node(pos)
-					minetest.add_item(vector.offset(pos, math.random(-0.5, 0.5), 0, math.random(-0.5, 0.5)), "mcl_core:cactus")
+					minetest.dig_node(pos)
+					-- minetest.add_item(vector.offset(pos, math.random(-0.5, 0.5), 0, math.random(-0.5, 0.5)), "mcl_core:cactus")
 					posy = posy + 1
 				end
 				break
@@ -312,6 +312,7 @@ local function check_growth_width(pos, width, height)
 	end
 	return true
 end
+mcl_core.check_growth_width = check_growth_width
 
 -- Check if a tree with id can grow at a position. Options is a table of flags
 -- for varieties of trees. The 'two_by_two' option is used to check if there is
@@ -1702,40 +1703,13 @@ end
 
 -- Obsidian crying
 
-local crobby_psdef = {
-			amount = 1,
-			time = 0.9, --everything longer than 1 is a coord exploit
-			minvel = vector.new(0,-2,0),
-			maxvel = vector.new(0,-0.5,0),
-			minacc = vector.new(0,-10,0),
-			maxacc = vector.new(0,-8,0),
-			minexptime = 1,
-			maxexptime = 6,
-			minsize = 1.5,
-			maxsize = 2,
-			collisiondetection = true,
-			collision_removal = true,
-			object_collision = true,
-			vertical = true,
-			texture = "mcl_core_crying_obsidian_tear.png",
+local crobby_particle = {
+	velocity = vector.new(0,0,0),
+	size = math.random(1.3,2.5),
+	texture = "mcl_core_crying_obsidian_tear.png",
+	collision_removal = false,
 }
-local crobby_psdef2 = {
-			amount = 1,
-			time = 0.9, --everything longer than 1 is a coord exploit
-			minvel = vector.new(0,-0.01,0),
-			maxvel = vector.new(0,-0.005,0),
-			minacc = vector.new(0,-0.1,0),
-			maxacc = vector.new(0,-0.01,0),
-			minexptime = 2,
-			maxexptime = 3,
-			minsize = 0.3,
-			maxsize = 0.6,
-			collisiondetection = true,
-			collision_removal = true,
-			object_collision = true,
-			vertical = true,
-			texture = "mcl_core_crying_obsidian_tear.png",
-}
+
 
 minetest.register_abm({
 	label = "Obsidian cries",
@@ -1744,22 +1718,18 @@ minetest.register_abm({
 	chance = 10,
 	action = function(pos, node)
 		minetest.after(math.random(0.1,1.5),function()
-			crobby_psdef.minpos = vector.offset(pos,-0.6,-0.51,-0.6)
-			crobby_psdef.maxpos = vector.offset(pos,0.6,0.51,0.6)
-			minetest.add_particlespawner(crobby_psdef)
-			crobby_psdef2.minpos = vector.offset(pos,-0.51,-0.51,-0.51)
-			crobby_psdef2.maxpos = vector.offset(pos,-0.5,0.51,-0.5)
-			minetest.add_particlespawner(crobby_psdef2)
-			crobby_psdef2.minpos = vector.offset(pos,0.51,-0.51,-0.51)
-			crobby_psdef2.maxpos = vector.offset(pos,0.5,0.51,-0.5)
-			minetest.add_particlespawner(crobby_psdef2)
-			crobby_psdef2.minpos = vector.offset(pos,0.51,-0.51,0.51)
-			crobby_psdef2.maxpos = vector.offset(pos,0.5,0.51,0.5)
-			minetest.add_particlespawner(crobby_psdef2)
-			crobby_psdef2.minpos = vector.offset(pos,-0.51,-0.51,0.51)
-			crobby_psdef2.maxpos = vector.offset(pos,-0.5,0.51,0.5)
-			minetest.add_particlespawner(crobby_psdef2)
-
+			local pt = table.copy(crobby_particle)
+			pt.acceleration = vector.new(0,0,0)
+			pt.collisiondetection = false
+			pt.expirationtime = math.random(0.5,1.5)
+			pt.pos = vector.offset(pos,math.random(-0.5,0.5),-0.51,math.random(-0.5,0.5))
+			minetest.add_particle(pt)
+			minetest.after(pt.expirationtime,function()
+				pt.acceleration = vector.new(0,-9,0)
+				pt.collisiondetection = true
+				pt.expirationtime = math.random(1.2,4.5)
+				minetest.add_particle(pt)
+			end)
 		end)
 	end
 })

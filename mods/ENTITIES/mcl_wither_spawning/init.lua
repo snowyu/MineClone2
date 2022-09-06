@@ -38,6 +38,12 @@ local function wither_spawn(pos)
 			if check_schem(p, schem) then
 				remove_schem(p, schem)
 				minetest.add_entity(vector.add(p, {x = 0, y = 1, z = 0, [d] = 1}), "mobs_mc:wither")
+				local objects = minetest.get_objects_inside_radius(pos, 20)
+				for _, players in ipairs(objects) do
+					if players:is_player() then
+						awards.unlock(players:get_player_name(), "mcl:witheringHeights")
+					end
+				end
 			end
 		end
 	end
@@ -46,6 +52,9 @@ end
 local wither_head = minetest.registered_nodes["mcl_heads:wither_skeleton"]
 local old_on_place = wither_head.on_place
 function wither_head.on_place(itemstack, placer, pointed)
-	minetest.after(0, wither_spawn, pointed.above)
-	old_on_place(itemstack, placer, pointed)
+	local n = minetest.get_node(vector.offset(pointed.above,0,-1,0))
+	if n and n.name  == "mcl_nether:soul_sand" then
+		minetest.after(0, wither_spawn, pointed.above)
+	end
+	return old_on_place(itemstack, placer, pointed)
 end

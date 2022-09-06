@@ -63,11 +63,12 @@ minetest.register_node("mcl_core:stone_with_iron", {
 	is_ground_content = true,
 	stack_max = 64,
 	groups = {pickaxey=3, building_block=1, material_stone=1, blast_furnace_smeltable=1},
-	drop = "mcl_core:stone_with_iron",
+	drop = "mcl_raw_ores:raw_iron",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
 	_mcl_hardness = 3,
 	_mcl_silk_touch_drop = true,
+	_mcl_fortune_drop = mcl_core.fortune_drop_ore,
 })
 
 
@@ -78,11 +79,12 @@ minetest.register_node("mcl_core:stone_with_gold", {
 	is_ground_content = true,
 	stack_max = 64,
 	groups = {pickaxey=4, building_block=1, material_stone=1, blast_furnace_smeltable=1},
-	drop = "mcl_core:stone_with_gold",
+	drop = "mcl_raw_ores:raw_gold",
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 3,
 	_mcl_hardness = 3,
 	_mcl_silk_touch_drop = true,
+	_mcl_fortune_drop = mcl_core.fortune_drop_ore,
 })
 
 local redstone_timer = 68.28
@@ -361,7 +363,7 @@ minetest.register_node("mcl_core:dirt_with_grass", {
 	_doc_items_longdesc = S("A grass block is dirt with a grass cover. Grass blocks are resourceful blocks which allow the growth of all sorts of plants. They can be turned into farmland with a hoe and turned into grass paths with a shovel. In light, the grass slowly spreads onto dirt nearby. Under an opaque block or a liquid, a grass block may turn back to dirt."),
 	_doc_items_hidden = false,
 	paramtype2 = "color",
-	tiles = {"mcl_core_grass_block_top.png", { name="default_dirt.png", color="white" }},
+	tiles = {"mcl_core_grass_block_top.png", { name="default_dirt.png^mcl_dirt_grass_shadow.png", color="white" }},
 	overlay_tiles = {"mcl_core_grass_block_top.png", "", {name="mcl_core_grass_block_side_overlay.png", tileable_vertical=false}},
 	palette = "mcl_core_palette_grass.png",
 	palette_index = 0,
@@ -1051,7 +1053,7 @@ for i=1,8 do
 			mcl_core.clear_snow_dirt(npos, node)
 		end,
 		node_box = node_box,
-		groups = {shovely=1, attached_node=1,deco_block=1, dig_by_piston=1, snow_cover=1, top_snow=i},
+		groups = {shovely=2, attached_node=1,deco_block=1, dig_by_piston=1, snow_cover=1, top_snow=i},
 		sounds = mcl_sounds.node_sound_snow_defaults(),
 		on_construct = mcl_core.on_snow_construct,
 		on_place = on_place,
@@ -1070,7 +1072,7 @@ minetest.register_node("mcl_core:snowblock", {
 	tiles = {"default_snow.png"},
 	is_ground_content = true,
 	stack_max = 64,
-	groups = {shovely=1, building_block=1, snow_cover=1},
+	groups = {shovely=2, building_block=1, snow_cover=1},
 	sounds = mcl_sounds.node_sound_snow_defaults(),
 	on_construct = mcl_core.on_snow_construct,
 	after_destruct = mcl_core.after_snow_destruct,

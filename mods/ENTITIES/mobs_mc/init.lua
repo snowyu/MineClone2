@@ -114,6 +114,7 @@ dofile(path .. "/squid.lua") -- Animation, sound and egg texture by daufinsyd
 dofile(path .. "/villager.lua") -- KrupnoPavel Mesh and animation by toby109tt  / https://github.com/22i
 
 -- Illagers and witch
+dofile(path .. "/pillager.lua") -- Mesh by KrupnoPavel and MrRar, animation by MrRar
 dofile(path .. "/villager_evoker.lua") -- Mesh and animation by toby109tt  / https://github.com/22i
 dofile(path .. "/villager_vindicator.lua") -- Mesh and animation by toby109tt  / https://github.com/22i
 dofile(path .. "/villager_zombie.lua") -- Mesh and animation by toby109tt  / https://github.com/22i
@@ -142,3 +143,8 @@ dofile(path .. "/slime+magma_cube.lua") -- Wuzzy
 dofile(path .. "/spider.lua") -- Spider by AspireMint (fishyWET (CC-BY-SA 3.0 license for texture)
 dofile(path .. "/vex.lua") -- KrupnoPavel
 dofile(path .. "/wither.lua") -- Mesh and animation by toby109tt  / https://github.com/22i
+
+dofile(path .. "/cod.lua")
+dofile(path .. "/salmon.lua")
+dofile(path .. "/tropical_fish.lua")
+dofile(path .. "/dolphin.lua")

@@ -219,6 +219,7 @@ local select_enderman_animation = function(animation_type)
 end
 
 local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
+local spawners = {}
 
 mcl_mobs:register_mob("mobs_mc:enderman", {
 	description = S("Enderman"),
@@ -257,23 +258,48 @@ mcl_mobs:register_mob("mobs_mc:enderman", {
 	},
 	animation = select_enderman_animation("normal"),
 	_taken_node = "",
+	can_spawn = function(pos)
+		return #minetest.find_nodes_in_area(vector.offset(pos,0,1,0),vector.offset(pos,0,3,0),{"air"}) > 2
+	end,
 	do_custom = function(self, dtime)
 		-- PARTICLE BEHAVIOUR HERE.
 		local enderpos = self.object:get_pos()
-		local chanceOfParticle = math.random(0, 1)
-		if chanceOfParticle == 1 then
-			minetest.add_particle({
-				pos = {x=enderpos.x+math.random(-1,1)*math.random()/2,y=enderpos.y+math.random(0,3),z=enderpos.z+math.random(-1,1)*math.random()/2},
-				velocity = {x=math.random(-.25,.25), y=math.random(-.25,.25), z=math.random(-.25,.25)},
-				acceleration = {x=math.random(-.5,.5), y=math.random(-.5,.5), z=math.random(-.5,.5)},
-				expirationtime = math.random(),
-				size = math.random(),
-				collisiondetection = true,
-				vertical = false,
-				texture = "mcl_portals_particle"..math.random(1, 5)..".png",
-			})
+		if self._particle_timer and self._particle_timer >= 1 then
+			for _,player in pairs(minetest.get_connected_players()) do
+				if not spawners[player] then spawners[player] = {} end
+				local dst = vector.distance(player:get_pos(),enderpos)
+				if dst < 128 and not spawners[player][self.object] then
+					self._particle_timer = 0
+					spawners[player][self.object] = minetest.add_particlespawner({
+						amount = 5,
+						minpos = vector.new(-0.6,0,-0.6),
+						maxpos = vector.new(0.6,3,0.6),
+						minvel = vector.new(-0.25,-0.25,-0.25),
+						maxvel = vector.new(0.25,0.25,0.25),
+						minacc = vector.new(-0.5,-0.5,-0.5),
+						maxacc = vector.new(0.5,0.5,0.5),
+						minexptime = 0.2,
+						maxexptime = 3,
+						minsize = 0.2,
+						maxsize = 1.2,
+						collisiondetection = true,
+						vertical = false,
+						time = 0,
+						texture = "mcl_portals_particle"..math.random(1, 5)..".png",
+						attached = self.object,
+						playername = player:get_player_name(),
+					})
+				elseif dst > 128 and spawners[player][self.object] then
+					minetest.delete_particlespawner(spawners[player][self.object])
+					spawners[player][self.object] = nil
+				end
+			end
+		elseif not self._particle_timer then
+			self._particle_timer = 0
 		end
+		self._particle_timer = self._particle_timer + dtime
 		-- RAIN DAMAGE / EVASIVE WARP BEHAVIOUR HERE.
+		enderpos = self.object:get_pos()
 		local dim = mcl_worlds.pos_to_dimension(enderpos)
 		if dim == "overworld" then
 			if mcl_weather.state == "rain" or mcl_weather.state == "lightning" then
@@ -309,24 +335,25 @@ mcl_mobs:register_mob("mobs_mc:enderman", {
 		else return end
 		-- AGRESSIVELY WARP/CHASE PLAYER BEHAVIOUR HERE.
 		if self.state == "attack" then
-			--if (minetest.get_timeofday() * 24000) > 5001 and (minetest.get_timeofday() * 24000) < 19000 then
-				--self:teleport(nil)
-				--self.state = ""
-			--else
-				if self.attack then
-					local target = self.attack
-					local pos = target:get_pos()
-					if pos ~= nil then
-						if vector.distance(self.object:get_pos(), target:get_pos()) > 10 then
-							self:teleport(target)
-						end
+			if self.attack then
+				local target = self.attack
+				local pos = target:get_pos()
+				if pos ~= nil then
+					if vector.distance(self.object:get_pos(), target:get_pos()) > 10 then
+						self:teleport(target)
 					end
 				end
-			--end
+			end
+		else --if not attacking try to tp to the dark
+			local light = minetest.get_node_light(enderpos)
+			if light and light > minetest.LIGHT_MAX then
+				self:teleport(nil)
+			end
 		end
 		-- ARROW / DAYTIME PEOPLE AVOIDANCE BEHAVIOUR HERE.
 		-- Check for arrows and people nearby.
-		local enderpos = self.object:get_pos()
+
+		enderpos = self.object:get_pos()
 		enderpos.y = enderpos.y + 1.5
 		local objs = minetest.get_objects_inside_radius(enderpos, 2)
 		for n = 1, #objs do
@@ -590,6 +617,14 @@ mcl_mobs:register_mob("mobs_mc:enderman", {
 	attack_type = "dogfight",
 })
 
+minetest.register_on_leaveplayer(function(player)
+	if not spawners[player] then return end
+	for _,s in pairs(spawners[player]) do
+		minetest.delete_particlespawner(s)
+	end
+	spawners[player] = nil
+end)
+
 
 -- End spawn
 mcl_mobs:spawn_specific(
@@ -627,7 +662,6 @@ mcl_mobs:spawn_specific(
 "Plains",
 "Desert",
 "ColdTaiga",
-"MushroomIsland",
 "IcePlainsSpikes",
 "SunflowerPlains",
 "IcePlains",
@@ -654,7 +688,6 @@ mcl_mobs:spawn_specific(
 "ExtremeHills_beach",
 "ColdTaiga_beach",
 "Swampland_shore",
-"MushroomIslandShore",
 "JungleM_shore",
 "Jungle_shore",
 "MesaPlateauFM_sandlevel",
@@ -693,7 +726,6 @@ mcl_mobs:spawn_specific(
 "Forest_deep_ocean",
 "JungleM_deep_ocean",
 "FlowerForest_deep_ocean",
-"MushroomIsland_ocean",
 "MegaTaiga_ocean",
 "StoneBeach_deep_ocean",
 "IcePlainsSpikes_deep_ocean",
@@ -703,7 +735,6 @@ mcl_mobs:spawn_specific(
 "MesaBryce_deep_ocean",
 "ExtremeHills+_deep_ocean",
 "ExtremeHills_ocean",
-"MushroomIsland_deep_ocean",
 "Forest_ocean",
 "MegaTaiga_deep_ocean",
 "JungleEdge_ocean",
@@ -729,7 +760,6 @@ mcl_mobs:spawn_specific(
 "RoofedForest_underground",
 "Jungle_underground",
 "Swampland_underground",
-"MushroomIsland_underground",
 "BirchForest_underground",
 "Plains_underground",
 "MesaPlateauF_underground",
@@ -767,10 +797,10 @@ mcl_mobs:spawn_specific(
 "ground",
 {
 "Nether",
-"SoulsandValley",
+"SoulsandVall3ey",
 },
 0,
-minetest.LIGHT_MAX+1,
+11,
 30,
 27500,
 4,
@@ -786,7 +816,7 @@ mcl_mobs:spawn_specific(
 "WarpedForest"
 },
 0,
-minetest.LIGHT_MAX+1,
+11,
 30,
 5000,
 4,

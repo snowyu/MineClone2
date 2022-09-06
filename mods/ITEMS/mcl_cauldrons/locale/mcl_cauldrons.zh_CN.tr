@@ -1,0 +1,11 @@
+# textdomain: mcl_cauldrons
+Cauldron=锅釜
+Cauldrons are used to store water and slowly fill up under rain. They can also be used to wash off banners.=锅釜是用来储水的，在雨水的作用下慢慢填满。它们也可以用来清洗旗帜。
+Place a water pucket into the cauldron to fill it with water. Place an empty bucket on a full cauldron to retrieve the water. Place a water bottle into the cauldron to fill the cauldron to one third with water. Place a glass bottle in a cauldron with water to retrieve one third of the water. Use an emblazoned banner on a cauldron with water to wash off its top layer.=将水桶放入锅釜中，使其充满水。将一个空桶放在装满水的大锅上，以取回水。将一个水瓶放入锅釜内，使大锅内增加三分之一的水。将一个玻璃瓶放在有水的锅釜里，取回三分之一的水。在有水的锅釜上使用印有图案的旗帜，以洗掉其上层。
+Cauldron (1/3 Water)=锅釜（1/3 水）
+Cauldron (2/3 Water)=锅釜（2/3 水）
+Cauldron (3/3 Water)=锅釜（3/3 水）
+Cauldron (1/3 River Water)=锅釜（1/3 河水）
+Cauldron (2/3 River Water)=锅釜（2/3 河水）
+Cauldron (3/3 River Water)=锅釜（3/3 河水）
+Stores water=储存水

@@ -1,0 +1,19 @@
+# textdomain: mcl_fire
+Fire Charge=火焰弹
+Fire charges are primarily projectiles which can be launched from dispensers, they will fly in a straight line and burst into a fire on impact. Alternatively, they can be used to ignite fires directly.=火焰弹主要是可以从发射器中发射的投射物，它们会沿直线飞行，并在撞击时爆裂成火。另外，它们也可以用来直接点燃火焰。
+Put the fire charge into a dispenser and supply it with redstone power to launch it. To ignite a fire directly, simply place the fire charge on the ground, which uses it up.=将火药放入发射器中，并为其提供红石动力以发射火药。要直接点火，只需将火药放本地上，这样就能用完。
+Flint and Steel=打火机
+Flint and steel is a tool to start fires and ignite blocks.=燧石和钢是一种用来起火和点燃木块的工具。
+Rightclick the surface of a block to attempt to light a fire in front of it or ignite the block. A few blocks have an unique reaction when ignited.=右键点击方块的表面，可以在它面前点火或点燃方块。有几种方块在被点燃时会有独特的反应。
+Fire is a damaging and destructive but short-lived kind of block. It will destroy and spread towards near flammable blocks, but fire will disappear when there is nothing to burn left. It will be extinguished by nearby water and rain. Fire can be destroyed safely by punching it, but it is hurtful if you stand directly in it. If a fire is started above netherrack or a magma block, it will immediately turn into an eternal fire.=火是一种具有伤害性和破坏性的方块，但持续时间很短。它将破坏并向附近的易燃区块蔓延，但当没有什么可燃烧的东西时，火就会消失。它将被附近的水和雨所熄灭。火可以通过打它来安全地摧毁，但如果你直接站在它里面，它是有伤害的。如果火是本地狱石或岩浆块上面点燃的，它将立即变成永恒的火。
+Fire is a damaging but non-destructive short-lived kind of block. It will disappear when there is no flammable block around. Fire does not destroy blocks, at least not in this world. It will be extinguished by nearby water and rain. Fire can be destroyed safely by punching it, but it is hurtful if you stand directly in it. If a fire is started above netherrack or a magma block, it will immediately turn into an eternal fire.=火是一种具有伤害性但无破坏性的短命方块。当周围没有可燃方块的时候，它就会消失。火不会破坏方块，至少在这个世界上不会。它将被附近的水和雨所熄灭。火可以通过打它来安全地摧毁，但如果你直接站在它里面，它是有伤害的。如果火是本地狱石或岩浆块上面点燃的，它将立即变成永恒的火。
+Eternal fire is a damaging block that might create more fire. It will create fire around it when flammable blocks are nearby. Eternal fire can be extinguished by punches and nearby water blocks. Other than (normal) fire, eternal fire does not get extinguished on its own and also continues to burn under rain. Punching eternal fire is safe, but it hurts if you stand inside.=永恒之火是一个具有破坏性的方块，可能会产生更多的火。当附近有易燃块方块时，它将在周围产生火焰。永恒之火可以被拳头和附近的水所熄灭。和（普通）火不同，永恒之火不会自行熄灭，而且在雨中也会继续燃烧。击打永恒之火是安全的，但如果你站在里面就会受伤。
+Eternal fire is a damaging block. Eternal fire can be extinguished by punches and nearby water blocks. Other than (normal) fire, eternal fire does not get extinguished on its own and also continues to burn under rain. Punching eternal fire is safe, but it hurts if you stand inside.=永恒之火是一种破坏性的方块。永恒之火可以被拳头和附近的水块所熄灭。和（普通）火不同，永恒之火不会自行熄灭，而且在雨中也会继续燃烧。击打永恒之火是安全的，但如果你站在里面就会受伤。
+@1 has been cooked crisp.=@1 被烧死了
+@1 felt the burn.=@1 被烧死了
+@1 died in the flames.=@1 在火焰中昇天
+@1 died in a fire.=@1 在火焰中昇天
+Fire=火
+Eternal Fire=永恒之火
+Dispenser projectile=发射器投射物
+Starts fires and ignites blocks=点火和点燃方块

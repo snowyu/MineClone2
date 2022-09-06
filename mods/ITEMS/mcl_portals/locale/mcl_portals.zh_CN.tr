@@ -1,0 +1,15 @@
+# textdomain: mcl_portals
+End Portal=终界传送门
+An End portal teleports creatures and objects to the mysterious End dimension (and back!).=终界传送门用于将生物和实体到达终末之界（或回来！）。
+Hop into the portal to teleport. Entering an End portal in the Overworld teleports you to a fixed position in the End dimension and creates a 5×5 obsidian platform at your destination. End portals in the End will lead back to your spawn point in the Overworld.=跳入传送门进行传送。进入终界传送门会将你传送到终界的一个固定位置，并在你的目的地创建一个5×5的黑曜石平台。终界的传送门会将你带回你在主界的出生点。
+End Portal Frame=终界传送门框架
+End portal frames are used in the construction of End portals. Each block has a socket for an eye of ender.=终界传送门框架用于建造终界传送门。每个框架都有一个插座，用于放置终界之眼。
+NOTE: The End dimension is currently incomplete and might change in future versions.=注意：终界目前还不完整，在未来的版本中可能会有变化。
+End Portal Frame with Eye of Ender=含终界之眼的终界传送门框架
+Nether Portal=地狱传送门
+A Nether portal teleports creatures and objects to the hot and dangerous Nether dimension (and back!). Enter at your own risk!=地狱传送门将生物和实体传送到炎热和危险的地狱（或回来！）。进入后风险自负！
+Stand in the portal for a moment to activate the teleportation. Entering a Nether portal for the first time will also create a new portal in the other dimension. If a Nether portal has been built in the Nether, it will lead to the Overworld. A Nether portal is destroyed if the any of the obsidian which surrounds it is destroyed, or if it was caught in an explosion.=在传送门中站立片刻以激活传送。第一次进入地狱传送门也会在另一维度创建一个新的传送门。如果本地狱建立了地狱传送门，它将会通​​向主世界。如果围绕着它的任何黑曜石被毁坏，或者它被卷入一场爆炸，地狱传送门就会被破坏。
+Obsidian is also used as the frame of Nether portals.=黑曜石也被用来作为地狱传送门的框架。
+To open a Nether portal, place an upright frame of obsidian with a width of at least 4 blocks and a height of 5 blocks, leaving only air in the center. After placing this frame, light a fire in the obsidian frame. Nether portals only work in the Overworld and the Nether.=要打开地狱传送门，需要放置一个直立的黑曜石框架，宽度至少为4块，高度为5块，中间只留有空气。放置这个框架后，在黑曜石框架中点火。地狱传送门只在主世界上和地狱起作用。
+Once placed, an eye of ender can not be taken back.=在摆放后，终界之眼无法再取回。
+Used to construct end portals=用于建造终界传送门

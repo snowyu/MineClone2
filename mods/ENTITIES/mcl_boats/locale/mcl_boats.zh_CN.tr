@@ -1,0 +1,11 @@
+# textdomain: mcl_boats
+Acacia Boat=相思木船
+Birch Boat=白桦木船
+Boat=船
+Boats are used to travel on the surface of water.=船是用来在水上行走的交通工具。
+Dark Oak Boat=黑橡木船
+Jungle Boat=丛林木船
+Oak Boat=橡木船
+Rightclick on a water source to place the boat. Rightclick the boat to enter it. Use [Left] and [Right] to steer, [Forwards] to speed up and [Backwards] to slow down or move backwards. Rightclick the boat again to leave it, punch the boat to make it drop as an item.=右键单击水源以放置船。右键单击船以搭乘它。使用[左]和[右]进行转向，[向前]加快速度，[向后]减速或向后移动。再次右键单击船以离开它，打击船以使其掉落为物品。
+Spruce Boat=杉木船
+Water vehicle=水上交通工具

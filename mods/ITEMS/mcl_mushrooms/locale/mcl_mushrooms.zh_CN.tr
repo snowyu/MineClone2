@@ -1,0 +1,24 @@
+# textdomain: mcl_mushrooms
+This decorative block is like a huge mushroom stem, but with the stem texture on all sides.=这个装饰块就像一个巨大的蘑菇茎，但四面都有茎的纹理。
+Huge red mushroom blocks are the cap parts of huge red mushrooms. It consists of a red skin and can have pores on each of its sides.=红色蘑菇方块是巨大的红蘑菇的菌盖部分。它由红色的皮肤组成，每一面都可以有毛孔。
+The stem part of a huge red mushroom.=
+Huge Red Mushroom Block=红色蘑菇方块
+Huge Red Mushroom Stem=红色蘑菇柄
+Huge Red Mushroom All-Faces Stem=红色蘑菇（全纹理）柄
+Huge brown mushroom blocks are the cap parts of huge brown mushrooms. It consists of a brown skin and can have pores on each of its sides.=
+The stem part of a huge brown mushroom.=
+Huge Brown Mushroom Block=棕色蘑菇方块
+Huge Brown Mushroom Stem=棕色蘑菇柄
+Huge Brown Mushroom All-Faces Stem=棕色蘑菇（全纹理）柄
+Brown mushrooms are fungi which grow and spread in darkness, but are sensitive to light. They are inedible as such, but they can be used to craft food items.=棕色蘑菇是在黑暗中生长和传播的真菌，但对光线敏感。它们本身不能食用，但可以用来制作食品。
+Red mushrooms are fungi which grow and spread in darkness, but are sensitive to light. They are inedible as such, but they can be used to craft food items.=红色蘑菇是在黑暗中生长和传播的真菌，但对光线敏感。它们本身不能食用，但可以用来制作食品。
+A single mushroom of this species will slowly spread over time towards a random solid opaque block with a light level of 12 or lower in a 3×3×3 cube around the mushroom. It stops spreading when there are 5 or more mushrooms of the same species within an area of 9×3×9 blocks around the mushroom.=这个品种的单个蘑菇会随着时间的推移，慢慢地向蘑菇周围3×3×3立方体中光照度为12或更低的随机固体不透明方块扩散。当蘑菇周围9×3×9块的区域内有5个或更多相同种类的蘑菇时，它就会停止扩散。
+Mushrooms will eventually uproot at a light level of 12 or higher. On mycelium or podzol, they survive and spread at any light level.=蘑菇最终会在12或更高的光照水平下连根拔起。在菌丝体或灰壤上，它们在任何光照水平下都能生存和传播。
+This mushroom can be placed on mycelium and podzol at any light level. It can also be placed on blocks which are both solid and opaque, as long as the light level at daytime is not higher than 12.=这种蘑菇可以放置在任何光照水平的菌丝和荚膜上。只要白天的光照度不高于12，它也可以放在既坚固又不透明的木块上。
+Brown Mushroom=棕色蘑菇
+Red Mushroom=红色蘑菇
+Mushroom Stew=蘑菇汤
+Mushroom stew is a healthy soup which can be consumed to restore some hunger points.=蘑菇汤是一种健康的汤，食用后可以恢复一些飢饿值。
+By placing huge mushroom blocks of the same species next to each other, the sides that touch each other will turn into pores permanently.=通过将同一物种的巨大蘑菇块放在一起，相互接触的侧面将永久地变成毛孔。
+Grows on podzol, mycelium and other blocks=在灰壤，菌丝体和其他方块上生长
+Spreads in darkness=在黑暗中扩散

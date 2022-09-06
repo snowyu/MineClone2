@@ -1,0 +1,12 @@
+# textdomain: mcl_throwing
+@1 used the ender pearl too often.=@1 扔得太多终界珍珠了。
+Use the punch key to throw.=按下击打键扔出
+Snowball=雪球
+Snowballs can be thrown or launched from a dispenser for fun. Hitting something with a snowball does nothing.=雪球可以被扔出或从发射器中发射出去取乐。用雪球打东西没有任何作用。
+Egg=蛋
+Eggs can be thrown or launched from a dispenser and breaks on impact. There is a small chance that 1 or even 4 chicks will pop out of the egg.=鸡蛋可以被抛出或从发射器中发射出去，并在撞击中破碎。有机会，1至4个小鸡会从蛋里跳出来。
+Ender Pearl=终界珍珠
+An ender pearl is an item which can be used for teleportation at the cost of health. It can be thrown and teleport the thrower to its impact location when it hits a solid block or a plant. Each teleportation hurts the user by 5 hit points.=末影珍珠是一种可以在损失生命值的情况下用于传送的物品。可以将其扔出并将撞到实心块或植物时将其传送到其撞击位置。每次传送都会伤害使用者5点生命值。
+Throwable=可扔出
+Chance to hatch chicks when broken=破碎时有可能孵化小鸡
+Teleports you on impact for cost of 5 HP=损失5点生命值以传送

@@ -1,0 +1,10 @@
+# textdomain: mcl_jukebox
+Music Disc=唱片
+A music disc holds a single music track which can be used in a jukebox to play music.=一张唱片可容纳单一的音乐曲目，可在唱片机中用于播放音乐。
+Place a music disc into an empty jukebox to play the music. Use the jukebox again to retrieve the music disc. The music can only be heard by you, not by other players.=将唱片放入空的唱片机中播放音乐。再次使用唱片机取出唱片。音乐只能由您自己听，而不能由其他玩家听。
+@1—@2=
+Jukebox=唱片机
+Jukeboxes play music when they're supplied with a music disc.=唱片机在提供唱片的情况下播放音乐。
+Place a music disc into an empty jukebox to insert the music disc and play music. If the jukebox already has a music disc, you will retrieve this music disc first. The music can only be heard by you, not by other players.=将音乐光盘放入空的点唱机，插入音乐光盘并播放音乐。如果点唱机已经有一张音乐光盘，你要先取回这张音乐光盘。音乐只能被你听到，不能被其他玩家听到。
+Now playing: @1—@2=正在播放：@1—@2
+Uses music discs to play music=使用唱片播放音乐

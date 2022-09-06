@@ -1,0 +1,7 @@
+# textdomain: mcl_experience
+[[<player>] <xp>]=[[<玩家名字>] <经验值>]
+Gives a player some XP=给予玩家经验值
+Error: Too many parameters!=错误：太多参数！
+Error: Incorrect value of XP=错误：经验值数值不当！
+Error: Player not found=错误：找不到玩家！
+Added @1 XP to @2, total: @3, experience level: @4=已给予 @2 @1 点经验值，共有 @3 点，经验等级：@4

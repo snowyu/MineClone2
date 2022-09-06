@@ -1,13 +1,13 @@
 # textdomain: mcl_walls
-A piece of wall. It cannot be jumped over with a simple jump. When multiple of these are placed to next to each other, they will automatically build a nice wall structure.=一塊牆。它不能用簡單的跳躍方式跳過去。當多個這樣的東西被放在一起時，它們會自動建立一個漂亮的牆體結構。
+A piece of wall. It cannot be jumped over with a simple jump. When multiple of these are placed to next to each other, they will automatically build a nice wall structure.=一堵牆。它不能用簡單的跳躍方式跳過去。當多個這樣的東西被放在一起時，它們會自動建立一個漂亮的牆體結構。
 Cobblestone Wall=鵝卵石牆
 Mossy Cobblestone Wall=青苔鵝卵石牆
-Andesite Wall=安山岩牆
-Granite Wall=花崗岩牆
-Diorite Wall=閃長岩牆
+Andesite Wall=安山巖牆
+Granite Wall=花崗巖牆
+Diorite Wall=閃長巖牆
 Brick Wall=紅磚牆
-Sandstone Wall=砂岩牆
-Red Sandstone Wall=紅砂岩牆
+Sandstone Wall=砂巖牆
+Red Sandstone Wall=紅砂巖牆
 Stone Brick Wall=石磚牆
 Mossy Stone Brick Wall=青苔石磚牆
 Prismarine Wall=海磷石牆

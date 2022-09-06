@@ -1,0 +1,16 @@
+# textdomain: mcl_hoppers
+Hopper=漏斗
+Hoppers are containers with 5 inventory slots. They collect dropped items from above, take items from a container above and attempt to put its items it into an adjacent container. Hoppers can go either downwards or sideways. Hoppers interact with chests, droppers, dispensers, shulker boxes, furnaces and hoppers.=漏斗是有5个物品槽的容器。它们从上面收集掉落的物品，从上面的容器中取出物品，并试图把它的物品放到邻近的容器中。漏斗可以向下或向侧面移动。漏斗与箱子、投掷器、发射器、界伏盒、熔炉和漏斗相互作用。
+Hoppers interact with containers the following way:=漏斗会对容器做以下事情：
+• Furnaces: Hoppers from above will put items into the source slot. Hoppers from below take items from the output slot. They also take items from the fuel slot when they can't be used as a fuel. Sideway hoppers that point to the furnace put items into the fuel slot=• 熔炉：从上面的漏斗会将物品放入源料槽。下方的漏斗从输出槽中取出物品。当物品不能作为燃料使用时，它们也会从燃料槽中取出物品。指向熔炉的侧边漏斗将物品放入燃料槽。
+• Ender chests: No interaction.=• 终界箱：不会有任何动作。
+• Other containers: Normal interaction.=• 其他容器：正常动作。
+Hoppers can be disabled when supplied with redstone power. Disabled hoppers don't move items.=供给红石电源时，可以禁用漏斗。被禁用的漏斗不会移动物品。
+To place a hopper vertically, place it on the floor or a ceiling. To place it sideways, place it at the side of a block. Use the hopper to access its inventory.=要垂直放置漏斗，可将其放本地板或天花板上。要想把它放在侧面，就把它放在一个方块的侧面。使用漏斗来访问其库存。
+Disabled Hopper=被禁用的漏斗
+Side Hopper=侧面漏斗
+Disabled Side Hopper=被禁用的侧面漏斗
+Inventory=物品栏
+5 inventory slots=5个物品槽
+Collects items from above, moves items to container below=从上面收集物品，并把物品放到下面的容器中
+Can be disabled with redstone power=可被红石电源禁用

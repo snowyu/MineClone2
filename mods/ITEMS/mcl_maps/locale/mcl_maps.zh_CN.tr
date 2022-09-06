@@ -1,0 +1,10 @@
+# textdomain: mcl_maps
+Empty Map=空地图
+Empty maps are not useful as maps, but they can be stacked and turned to maps which can be used.=空的地图作为地图是没有用的，但它们可以被叠加，并变成可以使用的地图。
+Rightclick to start using the map (which can't be stacked anymore).=右键单击以开始使用地图（该地图无法再堆叠）。
+Map=地图
+Maps show your surroundings as you explore the world.=当您探索世界时，地图会显示您的周围环境。
+Hold the map in any of the hotbar slots. This allows you to access the minimap by pressing the minimap key (see controls settings).=在任何一个热键槽中放置地图。这允许你通过按小地图键来访问小地图（见控制设置）。
+In Creative Mode, you don't need this item; the minimap is always available.=在创造模式下，您不需要此项目； 小地图始终可用。
+Enables minimap=启用小地图
+Use the minimap key to show the map.=使用小地图键来显示小地图。

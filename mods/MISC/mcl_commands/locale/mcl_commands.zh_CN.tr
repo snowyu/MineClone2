@@ -1,0 +1,23 @@
+# textdomain: mcl_commands
+Players can't be killed right now, damage has been disabled.=玩家现在不能被杀死，伤害已被禁用。
+Player @1 does not exist.=玩家 @1 不存在。
+You are already dead=你已经死了
+@1 is already dead=@1 已经死了。
+@1 committed suicide.=@1 自杀了。
+@1 was killed by @2.=@1 被 @2 杀死了。
+[<name>]=[<名字>]
+Kill player or yourself=杀死玩家或自己
+Can use /say=可以使用 /say
+<message>=<信息>
+Send a message to every player=广播信息给每个玩家
+Invalid usage, see /help say.=无效用法，见 /help say
+<X>,<Y>,<Z> <NodeString>=<X>,<Y>,<Z> <方块名称>
+Set node at given position=在指定位置放置指定方块
+Invalid node=无效方块
+@1 spawned.=@1 已生成。
+Invalid parameters (see /help setblock)=无效参数（见 /help setblock）
+List bans=查看封锁列表
+Ban list: @1=封锁列表：@1
+Show who is logged on=列出在线玩家
+Displays the world seed=显示种子码
+Only peaceful mobs allowed!=只允许和平生物！

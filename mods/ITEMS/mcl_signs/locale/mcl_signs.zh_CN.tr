@@ -1,0 +1,9 @@
+# textdomain: mcl_signs
+Sign=告示牌
+Signs can be written and come in two variants: Wall sign and sign on a sign post. Signs can be placed on the top and the sides of other blocks, but not below them.=告示牌可以写字，有两种变体：墙上的告示牌和柱上的告示牌。告示牌可以放在其他方块的顶部和侧面，但不能放在下面。
+After placing the sign, you can write something on it. You have 4 lines of text with up to 15 characters for each line; anything beyond these limits is lost. Not all characters are supported. The text can not be changed once it has been written; you have to break and place the sign again.=放置告示牌后，你可以在上面写东西。你最多可以写4行文字，每行最多可以写15个字符；超过这些限制的文字就会丢失。不是所有的字符都被支持。文字一旦写完就不能更改；你必须打破并重新放置标志。
+Enter sign text:=输入告示牌文字：
+Maximum line length: 15=每行最多可以写15个字符
+Maximum lines: 4=最多可以写4行文字
+Done=确认
+Can be written=可以写字

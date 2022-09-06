@@ -1,0 +1,9 @@
+# textdomain: mcl_furnaces
+Furnace=熔炉
+Furnaces cook or smelt several items, using a furnace fuel, into something else.=熔炉用一种炉子燃料将几种物品烹饪或熔炼成其他东西。
+Use the furnace to open the furnace menu. Place a furnace fuel in the lower slot and the source material in the upper slot. The furnace will slowly use its fuel to smelt the item. The result will be placed into the output slot at the right side.=使用熔炉打开炉子菜单。将熔炉燃料放在下槽，将源材料放在上槽。熔炉将慢慢地使用它的燃料来熔炼或烹饪物品。其结果将被放入右侧的输出槽中。
+Use the recipe book to see what you can smelt, what you can use as fuel and how long it will burn.=使用配方书来查看您可以冶炼的东西，可以用作燃料的物品以及可燃烧时间。
+Burning Furnace=燃烧的熔炉
+Recipe book=配方书
+Inventory=物品栏
+Uses fuel to smelt or cook items=使用燃料来熔炼或烹饪物品

@@ -1,0 +1,7 @@
+# textdomain: mcl_structures
+Generate a pre-defined structure near your position.=在你的位置附近生成一个预定义的结构。
+Structure placed.=结构已生成。
+Village built. WARNING: Villages are experimental and might have bugs.=村庄已生成。警告：村庄是实验性的，可能会有错误。
+Error: No structure type given. Please use “/spawnstruct <type>”.=错误：未提供结构类型。请使用「/spawnstruct <种类>」。
+Error: Unknown structure type. Please use “/spawnstruct <type>”.=错误：未知结构类型。请使用「/spawnstruct <种类>」。
+Use /help spawnstruct to see a list of avaiable types.=使用「/help spawnstruct」以查看可用结构列表。
